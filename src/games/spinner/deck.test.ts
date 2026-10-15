@@ -56,3 +56,12 @@ test('prefers cards not seen in previous games', () => {
 test('fillTemplate substitutes all placeholders', () => {
   expect(fillTemplate('{asker} → {answerer}, {asker}!', 'Маша', 'Петя')).toBe('Маша → Петя, Маша!');
 });
+
+test('forced kind: a replacement card keeps the kind of the one it replaces', () => {
+  const rng = mulberry32(3);
+  for (let i = 0; i < 20; i++) {
+    const { card, usedIds } = pickCard(CARDS, { level: 1, usedIds: ['q1'], seenIds: none, actionRatio: 1, rng, kind: 'question' });
+    expect(card.id).toBe('q2');
+    expect(usedIds).toEqual(['q1', 'q2']);
+  }
+});

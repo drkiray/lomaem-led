@@ -56,3 +56,11 @@ test('restore: rejects garbage, resumes a mid-spin save into the card phase', ()
   expect(restored.phase).toBe('card');
   expect(restored.rotation).toBe(1000 % 360);
 });
+
+test('reroll swaps the shown card only while it is shown', () => {
+  const shown = { ...createSpinnerGame(['А', 'Б'], { spinDurationSec: 4, actionRatio: 0.3 }, [{ asker: 0, answerer: 1 }, { asker: 1, answerer: 0 }]), phase: 'card' as const, cardId: 'q1', usedIds: ['q1'] };
+  const next = spinnerReducer(shown, { type: 'reroll', cardId: 'q2', usedIds: ['q1', 'q2'] });
+  expect(next).toMatchObject({ phase: 'card', cardId: 'q2', usedIds: ['q1', 'q2'], turnIndex: 0 });
+  const ready = { ...shown, phase: 'ready' as const };
+  expect(spinnerReducer(ready, { type: 'reroll', cardId: 'q2', usedIds: [] })).toBe(ready);
+});

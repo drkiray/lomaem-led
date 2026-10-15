@@ -17,11 +17,13 @@ interface PickOptions {
   seenIds: ReadonlySet<string>;
   actionRatio: number;
   rng: Rng;
+  /** force the kind — a replacement card keeps the kind of the one it replaces */
+  kind?: CardKind;
 }
 
 // Priority: this level → not used in this game (reset level when exhausted)
 // → wanted kind (by actionRatio, else any) → not seen in earlier games.
-export function pickCard(cards: Card[], { level, usedIds, seenIds, actionRatio, rng }: PickOptions): { card: Card; usedIds: string[] } {
+export function pickCard(cards: Card[], { level, usedIds, seenIds, actionRatio, rng, kind: forced }: PickOptions): { card: Card; usedIds: string[] } {
   const levelCards = cards.filter((c) => c.level === level);
   if (levelCards.length === 0) throw new Error(`No cards for level ${level}`);
 
@@ -33,7 +35,7 @@ export function pickCard(cards: Card[], { level, usedIds, seenIds, actionRatio, 
     pool = levelCards;
   }
 
-  const kind: CardKind = rng() < actionRatio ? 'action' : 'question';
+  const kind: CardKind = forced ?? (rng() < actionRatio ? 'action' : 'question');
   const ofKind = pool.filter((c) => c.kind === kind);
   const kindPool = ofKind.length > 0 ? ofKind : pool;
   const fresh = kindPool.filter((c) => !seenIds.has(c.id));

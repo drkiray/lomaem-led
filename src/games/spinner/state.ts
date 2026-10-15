@@ -24,6 +24,7 @@ export interface SpinnerState {
 export type SpinnerAction =
   | { type: 'spin'; rotation: number; cardId: string; usedIds: string[] }
   | { type: 'spinDone' }
+  | { type: 'reroll'; cardId: string; usedIds: string[] }
   | { type: 'cardDone' }
   | { type: 'startRound'; level: Level; turns: Turn[] };
 
@@ -43,6 +44,9 @@ export function spinnerReducer(state: SpinnerState, action: SpinnerAction): Spin
     case 'spinDone':
       if (state.phase !== 'spinning') return state;
       return { ...state, phase: 'card', rotation: normalizeDeg(state.rotation) };
+    case 'reroll':
+      if (state.phase !== 'card') return state;
+      return { ...state, cardId: action.cardId, usedIds: action.usedIds };
     case 'cardDone':
       if (state.phase !== 'card') return state;
       if (state.turnIndex + 1 >= state.turns.length) return { ...state, phase: 'roundEnd', cardId: null };

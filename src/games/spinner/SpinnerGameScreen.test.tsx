@@ -105,3 +105,17 @@ test('no landscape prompt when turned off in settings', () => {
   expect(screen.queryByRole('dialog', { name: 'Поворачиваем экран' })).toBeNull();
   unstubFullscreen();
 });
+
+test('«не хочу отвечать» replaces the question with another question', async () => {
+  save({ phase: 'card', cardId: 'l1-q1', usedIds: ['l1-q1'] });
+  renderWithProviders(<SpinnerGameScreen />);
+  const dialog = screen.getByRole('dialog', { name: 'Вопрос' });
+  const before = dialog.querySelector('.spin-card__text')!.textContent;
+  await userEvent.click(screen.getByRole('button', { name: /не хочу отвечать/ }));
+  expect(screen.getByRole('dialog', { name: 'Вопрос' }).querySelector('.spin-card__text')!.textContent).not.toBe(before);
+  const game = JSON.parse(localStorage.getItem('ll.spinner.game')!);
+  expect(game.cardId).not.toBe('l1-q1');
+  expect(game.cardId).toMatch(/^l1-q/);
+  expect(game.usedIds).toEqual(['l1-q1', game.cardId]);
+  expect(game.turnIndex).toBe(0);
+});

@@ -85,6 +85,23 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
     busy.current = false;
   };
 
+  // «не хочу отвечать»: another card of the same level and kind instead
+  const reroll = () => {
+    if (state.phase !== 'card' || !card) return;
+    const seen = loadJSON<string[]>(KEYS.spinnerSeen, []);
+    const { card: next, usedIds } = pickCard(SPINNER_CARDS, {
+      level: state.level,
+      usedIds: state.usedIds,
+      seenIds: new Set(seen),
+      actionRatio: state.config.actionRatio,
+      rng: Math.random,
+      kind: card.kind,
+    });
+    saveJSON(KEYS.spinnerSeen, [...seen, next.id]);
+    fx.sfx('tap');
+    dispatch({ type: 'reroll', cardId: next.id, usedIds });
+  };
+
   const startRound = (level: Level) =>
     dispatch({ type: 'startRound', level, turns: buildRoundTurns(state.players.length, Math.random) });
 
@@ -139,7 +156,11 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone' })}>Готово</Button>}
       >
         <p className="spin-card__names"><b>{asker}</b> → <b>{answerer}</b></p>
-        <p className="spin-card__text">{card ? fillTemplate(card.text, asker, answerer) : ''}</p>
+        <p className="spin-card__text" key={card?.id}>{card ? fillTemplate(card.text, asker, answerer) : ''}</p>
+        <button type="button" className="spin-card__reroll" onClick={reroll}>
+          <span className="spin-card__reroll-icon" aria-hidden="true">↻</span>
+          {card?.kind === 'action' ? 'не хочу делать' : 'не хочу отвечать'}
+        </button>
       </Modal>
 
       <Modal
