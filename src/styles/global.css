@@ -211,10 +211,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* Transitions */
 .screen-enter { position: relative; z-index: 1; animation: screen-in 0.35s ease-out backwards; }
-/* Faint, behind the content (z-index 0 under .screen-enter's 1). It starts once
-   the screen has settled: while .screen-enter still animates opacity/filter,
-   the frosted panels below cannot blur what lies behind them. */
-.ice-crack { position: fixed; inset: 0; width: 100vw; height: 100dvh; pointer-events: none; z-index: 0; opacity: 0; animation: crack-fade 1.1s ease-out 0.3s both; }
+/* Faint, behind the content (z-index 0 under .screen-enter's 1). ScreenTransition
+   mounts it only after .screen-enter's fade-in ends: until then the frosted
+   panels cannot blur what lies behind them. */
+.ice-crack { position: fixed; inset: 0; width: 100vw; height: 100dvh; pointer-events: none; z-index: 0; opacity: 0; animation: crack-fade 1.1s ease-out both; }
 /* Frosted panels: the crack blurs away behind buttons and cards. */
 .btn, .icon-btn, .input, .segmented, .game-card, .settings-section, .setup-options, .level-pill,
 .team-card, .chip, .scoreboard li, .review__item { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
