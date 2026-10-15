@@ -1,11 +1,12 @@
 import type { ComponentType } from 'react';
 import { MenuScreen } from '../menu/MenuScreen';
+import { SettingsScreen } from '../settings/SettingsScreen';
 import { ComingSoon } from './ComingSoon';
 import type { RouteName } from './nav';
 
 export const SCREENS: Record<RouteName, ComponentType> = {
   menu: MenuScreen,
-  settings: ComingSoon,
+  settings: SettingsScreen,
   'spinner-setup': ComingSoon,
   'spinner-game': ComingSoon,
   'hat-setup': ComingSoon,
