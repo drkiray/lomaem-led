@@ -19,11 +19,11 @@ import './spinner.css';
 const LEVEL_TITLES: Record<Level, string> = { 1: 'Знакомство', 2: 'Глубже', 3: 'Психология' };
 
 export function SpinnerGameScreen() {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
   const [initial] = useState(() => restoreSpinnerGame(loadJSON<unknown>(KEYS.spinnerGame, null)));
   if (!initial) {
     return (
-      <Screen title="Крутилочка" onBack={() => navigate('menu')}>
+      <Screen title="Крутилочка" onBack={back}>
         <p className="muted center">Нет активной игры.</p>
         <Button size="lg" onClick={() => navigate('spinner-setup', { replace: true })}>Новая игра</Button>
       </Screen>
@@ -33,7 +33,7 @@ export function SpinnerGameScreen() {
 }
 
 function SpinnerGame({ initial }: { initial: SpinnerState }) {
-  const { navigate, back } = useNav();
+  const { back } = useNav();
   const { settings } = useSettings();
   const fx = useFeedback();
   const [state, dispatch] = useReducer(spinnerReducer, initial);
@@ -87,7 +87,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
 
   const finish = () => {
     removeKey(KEYS.spinnerGame);
-    navigate('menu');
+    back();
   };
 
   return (

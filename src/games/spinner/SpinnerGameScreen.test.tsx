@@ -47,10 +47,11 @@ test('round end offers next level', async () => {
 
 test('after level 3 can finish the game', async () => {
   save({ phase: 'roundEnd', level: 3, turnIndex: 1 });
-  const { navigate } = renderWithProviders(<SpinnerGameScreen />);
+  const { back, navigate } = renderWithProviders(<SpinnerGameScreen />);
   await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
   expect(localStorage.getItem('ll.spinner.game')).toBeNull();
-  expect(navigate).toHaveBeenCalledWith('menu');
+  expect(back).toHaveBeenCalled(); // pop back to the menu entry, no phantom history entry
+  expect(navigate).not.toHaveBeenCalled();
 });
 
 test('level pill switches round after confirmation', async () => {
@@ -63,9 +64,10 @@ test('level pill switches round after confirmation', async () => {
 
 test('exit via ✕ asks for confirmation', async () => {
   save();
-  const { navigate } = renderWithProviders(<SpinnerGameScreen />);
+  const { back, navigate } = renderWithProviders(<SpinnerGameScreen />);
   await userEvent.click(screen.getByRole('button', { name: 'Завершить' }));
   await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
-  expect(navigate).toHaveBeenCalledWith('menu');
+  expect(back).toHaveBeenCalled(); // pop back to the menu entry, no phantom history entry
+  expect(navigate).not.toHaveBeenCalled();
   expect(localStorage.getItem('ll.spinner.game')).toBeNull();
 });

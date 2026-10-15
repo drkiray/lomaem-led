@@ -81,9 +81,10 @@ test('game end shows winner, replay resets scores, menu clears save', async () =
 
 test('tie and exit to menu', async () => {
   save({ phase: 'gameEnd', round: 3, hat: [], scores: { t0: 4, t1: 4 } });
-  const { navigate } = renderWithProviders(<HatGameScreen />);
+  const { back, navigate } = renderWithProviders(<HatGameScreen />);
   expect(screen.getByText('Ничья! 🤝')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'В меню' }));
-  expect(navigate).toHaveBeenCalledWith('menu');
+  expect(back).toHaveBeenCalled(); // pop back to the menu entry, no phantom history entry
+  expect(navigate).not.toHaveBeenCalled();
   expect(localStorage.getItem('ll.hat.game')).toBeNull();
 });

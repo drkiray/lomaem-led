@@ -18,11 +18,11 @@ import { buildWordSet } from './words';
 import './hat.css';
 
 export function HatGameScreen() {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
   const [initial] = useState(() => restoreHatGame(loadJSON<unknown>(KEYS.hatGame, null)));
   if (!initial) {
     return (
-      <Screen title="Шляпа" onBack={() => navigate('menu')}>
+      <Screen title="Шляпа" onBack={back}>
         <p className="muted center">Нет активной игры.</p>
         <Button size="lg" onClick={() => navigate('hat-setup', { replace: true })}>Новая игра</Button>
       </Screen>
@@ -32,7 +32,7 @@ export function HatGameScreen() {
 }
 
 function HatGame({ initial }: { initial: HatState }) {
-  const { navigate, back } = useNav();
+  const { back } = useNav();
   const { settings } = useSettings();
   const fx = useFeedback();
   const [state, dispatch] = useReducer(hatReducer, initial);
@@ -82,7 +82,7 @@ function HatGame({ initial }: { initial: HatState }) {
   };
   const finish = () => {
     removeKey(KEYS.hatGame);
-    navigate('menu');
+    back();
   };
 
   return (
