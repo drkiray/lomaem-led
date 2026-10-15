@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useNav } from '../app/nav';
 import { GAMES } from './games';
+import { ResumeBanner } from './ResumeBanner';
 
 export function MenuScreen() {
   const { navigate } = useNav();
@@ -15,6 +16,7 @@ export function MenuScreen() {
         Ломаем <span>Лёд</span>
       </h1>
       <p className="menu__tagline">Игры, чтобы растопить любую компанию</p>
+      <ResumeBanner />
       <ul className="game-list">
         {GAMES.map((game) => {
           const locked = game.route === null;
