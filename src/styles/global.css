@@ -223,8 +223,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* Faint, behind the content (z-index 0 under .screen-enter's 1). ScreenTransition
    mounts it only after .screen-enter's fade-in ends: until then the frosted
    panels cannot blur what lies behind them. Lines start undrawn and creep in
-   from the edges over ~25s (per-path delay/duration set inline), then stay.
-   No glow filter: re-rasterising it every frame for 25s would drain the battery. */
+   from the edges over ~17s (per-path delay/duration set inline), then stay.
+   No glow filter: re-rasterising it every frame for 17s would drain the battery. */
 .ice-crack { position: fixed; inset: 0; width: 100vw; height: 100dvh; pointer-events: none; z-index: 0; opacity: 0.32; }
 .ice-crack path {
   fill: none; stroke: var(--ice);

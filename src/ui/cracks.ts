@@ -5,11 +5,11 @@ import type { Rng } from '../lib/random';
 export const CRACK_W = 100;
 export const CRACK_H = 200;
 /** the ice keeps cracking for this long after a screen opens */
-export const CRACK_DURATION_S = 25;
+export const CRACK_DURATION_S = 17.5;
 
-const SPEED = 5; // box units per second — a slow creep
-const FIRST_START_S = 0.8; // nothing is drawn when the screen opens
-const LAST_START_S = 11;
+const SPEED = 5 / 0.7; // box units per second — a slow creep
+const FIRST_START_S = 0.6; // nothing is drawn when the screen opens
+const LAST_START_S = 7.7;
 const MAX_PATHS = 90;
 
 export interface CrackPath {

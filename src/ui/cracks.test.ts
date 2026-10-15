@@ -21,7 +21,7 @@ test('nothing is drawn when the screen opens: every crack starts later', () => {
 });
 
 test('the whole pattern finishes growing within the animation length', () => {
-  expect(CRACK_DURATION_S).toBe(25);
+  expect(CRACK_DURATION_S).toBe(17.5);
   for (let seed = 0; seed < 100; seed++) {
     const cracks = generateCracks(mulberry32(seed));
     for (const c of cracks) {
