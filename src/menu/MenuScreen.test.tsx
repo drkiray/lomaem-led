@@ -37,3 +37,11 @@ test('credits link the author in Telegram', () => {
   expect(link).toHaveAttribute('target', '_blank');
   expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
 });
+
+test('every card puts its emoji or icon in the same fixed slot, so titles line up', () => {
+  renderWithProviders(<MenuScreen />);
+  for (const name of [/Крутилочка/, /Шляпа/, /Правда или действие/, /Нетворкинг/]) {
+    const card = screen.getByRole('button', { name });
+    expect(card.firstElementChild).toHaveClass('game-card__slot');
+  }
+});

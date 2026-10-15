@@ -29,11 +29,9 @@ export function MenuScreen() {
                 disabled={locked}
                 onClick={() => game.route && navigate(game.route)}
               >
-                {game.icon ? (
-                  <img className="game-card__icon" src={game.icon} alt="" />
-                ) : (
-                  <span className="game-card__emoji" aria-hidden="true">{game.emoji}</span>
-                )}
+                <span className="game-card__slot" aria-hidden="true">
+                  {game.icon ? <img className="game-card__icon" src={game.icon} alt="" /> : game.emoji}
+                </span>
                 <span className="game-card__text">
                   <span className="game-card__title">{game.title}</span>
                   <span className="game-card__subtitle">{game.subtitle}</span>

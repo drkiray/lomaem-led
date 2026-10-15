@@ -182,8 +182,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
   transition: transform 0.12s ease;
 }
 .game-card:active { transform: scale(0.98); }
-.game-card__emoji { font-size: 36px; filter: drop-shadow(0 0 10px var(--accent)); }
-.game-card__icon { width: 36px; height: 36px; border-radius: 9px; flex: none; filter: drop-shadow(0 0 10px var(--accent)); }
+/* Fixed slot: emoji widths differ between fonts (Android vs desktop), so the
+   titles only line up when every card reserves the same width. */
+.game-card__slot {
+  width: 52px; height: 52px; flex: none; display: grid; place-items: center;
+  font-size: 36px; line-height: 1; filter: drop-shadow(0 0 10px var(--accent));
+}
+.game-card__icon { width: 40px; height: 40px; border-radius: 10px; display: block; }
 .game-card__text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
 .game-card__title { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 .game-card__subtitle { color: var(--muted); font-size: 14px; }
