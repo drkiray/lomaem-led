@@ -6,6 +6,7 @@ export const KEYS = {
   spinnerGame: 'spinner.game',
   spinnerSeen: 'spinner.seen',
   hatGame: 'hat.game',
+  hatReplay: 'hat.replay',
 } as const;
 
 export function loadJSON<T>(key: string, fallback: T): T {

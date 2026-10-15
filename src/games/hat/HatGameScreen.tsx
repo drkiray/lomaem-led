@@ -14,6 +14,7 @@ import {
 } from './HatViews';
 import { ROUNDS } from './rounds';
 import { hatReducer, restoreHatGame, type HatState } from './state';
+import type { HatReplay } from './HatSetupScreen';
 import { buildWordSet } from './words';
 import './hat.css';
 
@@ -32,7 +33,7 @@ export function HatGameScreen() {
 }
 
 function HatGame({ initial }: { initial: HatState }) {
-  const { back } = useNav();
+  const { back, navigate } = useNav();
   const { settings } = useSettings();
   const fx = useFeedback();
   const [state, dispatch] = useReducer(hatReducer, initial);
@@ -77,6 +78,14 @@ function HatGame({ initial }: { initial: HatState }) {
     dispatch({ type: 'skip' });
   };
   const replay = () => {
+    if (state.wordSetup.mode !== 'dictionary') {
+      // own words were just played three times over — collect fresh ones
+      const replaySetup: HatReplay = { teams: state.teams, mode: state.wordSetup.mode };
+      saveJSON(KEYS.hatReplay, replaySetup);
+      removeKey(KEYS.hatGame);
+      navigate('hat-setup', { replace: true });
+      return;
+    }
     const words = buildWordSet(state.wordSetup, HAT_WORDS, Math.random, state.words);
     dispatch({ type: 'restart', words, order: shuffle(words, Math.random) });
   };

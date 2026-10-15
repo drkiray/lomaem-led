@@ -88,3 +88,12 @@ test('tie and exit to menu', async () => {
   expect(navigate).not.toHaveBeenCalled();
   expect(localStorage.getItem('ll.hat.game')).toBeNull();
 });
+
+test('replay in own-words mode returns to setup with the same teams instead of reusing words', async () => {
+  save({ phase: 'gameEnd', round: 3, hat: [], scores: { t0: 5, t1: 3 }, wordSetup: { mode: 'own', difficulty: 'mix', count: 30, ownWords: ['кот', 'дом', 'лес'] } });
+  const { navigate } = renderWithProviders(<HatGameScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Сыграть ещё' }));
+  expect(navigate).toHaveBeenCalledWith('hat-setup', { replace: true });
+  expect(localStorage.getItem('ll.hat.game')).toBeNull();
+  expect(JSON.parse(localStorage.getItem('ll.hat.replay')!)).toEqual({ teams, mode: 'own' });
+});
