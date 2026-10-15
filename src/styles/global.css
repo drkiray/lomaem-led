@@ -232,5 +232,5 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
   .ice-crack { display: none; }
-  .screen-enter, .modal, .modal-backdrop { animation: none; }
+  .screen-enter, .modal, .modal-backdrop, .wheel__hub, .wheel__hub::after, .wheel__hub-icon { animation: none !important; }
 }

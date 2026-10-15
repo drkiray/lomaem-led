@@ -31,3 +31,10 @@ test('long names are truncated on crowded wheels', () => {
   render(<Wheel players={many} activeIndex={0} arrowRef={createRef()} disabled={false} onSpin={() => {}} />);
   expect(screen.getAllByText(/…$/).length).toBeGreaterThan(0);
 });
+
+test('hub shows an icon, not text that could overflow it', () => {
+  render(<Wheel players={players} activeIndex={0} arrowRef={createRef()} disabled={false} onSpin={() => {}} />);
+  const hub = screen.getByRole('button', { name: 'Крутить' });
+  expect(hub.textContent).toBe('');
+  expect(hub.querySelector('svg.wheel__hub-icon')).not.toBeNull();
+});

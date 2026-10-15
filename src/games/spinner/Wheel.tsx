@@ -58,7 +58,10 @@ export function Wheel({ players, activeIndex, arrowRef, disabled, onSpin }: Prop
         </g>
       </svg>
       <button type="button" className="wheel__hub" aria-label="Крутить" disabled={disabled} onClick={onSpin}>
-        Крути
+        <svg className="wheel__hub-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 12a8 8 0 1 1-2.34-5.66" />
+          <path d="M20 4v4.5h-4.5" />
+        </svg>
       </button>
     </div>
   );
