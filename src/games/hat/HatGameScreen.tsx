@@ -4,11 +4,9 @@ import { useFeedback } from '../../audio/useFeedback';
 import { HAT_WORDS } from '../../content/hatWords';
 import { shuffle } from '../../lib/random';
 import { KEYS, loadJSON, removeKey, saveJSON } from '../../lib/storage';
-import { useLandscape } from '../../lib/useLandscape';
 import { useWakeLock } from '../../lib/useWakeLock';
 import { useSettings } from '../../settings/SettingsContext';
 import { Button } from '../../ui/Button';
-import { FullscreenButton, LandscapePrompt } from '../../ui/LandscapePrompt';
 import { Modal } from '../../ui/Modal';
 import { Screen } from '../../ui/Screen';
 import {
@@ -42,7 +40,6 @@ function HatGame({ initial }: { initial: HatState }) {
   const [confirmExit, setConfirmExit] = useState(false);
 
   useWakeLock(settings.keepAwake);
-  const landscape = useLandscape(settings.landscapeGames);
 
   useEffect(() => {
     saveJSON(KEYS.hatGame, state);
@@ -102,10 +99,7 @@ function HatGame({ initial }: { initial: HatState }) {
       <header className="hat-game__header">
         <button type="button" className="icon-btn" aria-label="Назад" onClick={back}>←</button>
         <span className="hat-game__round">Раунд {state.round} · {ROUNDS[state.round].title}</span>
-        <div className="game-header__actions">
-          <FullscreenButton landscape={landscape} />
-          <button type="button" className="icon-btn" aria-label="Завершить" onClick={() => setConfirmExit(true)}>✕</button>
-        </div>
+        <button type="button" className="icon-btn" aria-label="Завершить" onClick={() => setConfirmExit(true)}>✕</button>
       </header>
 
       {state.phase === 'roundIntro' && <RoundIntroView round={state.round} onStart={() => dispatch({ type: 'beginRound' })} />}
@@ -140,7 +134,6 @@ function HatGame({ initial }: { initial: HatState }) {
       >
         <p>Счёт этой партии будет удалён.</p>
       </Modal>
-      <LandscapePrompt landscape={landscape} />
     </div>
   );
 }

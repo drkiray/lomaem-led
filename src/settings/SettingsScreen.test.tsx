@@ -13,9 +13,9 @@ test('toggles vibration and keep-awake', async () => {
   expect(stored().keepAwake).toBe(false);
 });
 
-test('toggles landscape mode for games', async () => {
+test('toggles landscape mode for Крутилочка', async () => {
   renderWithProviders(<SettingsScreen />);
-  const toggle = screen.getByRole('switch', { name: /Горизонтально во весь экран/ });
+  const toggle = screen.getByRole('switch', { name: /Крутилочка горизонтально/ });
   expect(toggle).toHaveAttribute('aria-checked', 'true');
   await userEvent.click(toggle);
   expect(stored().landscapeGames).toBe(false);

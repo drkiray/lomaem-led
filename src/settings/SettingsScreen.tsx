@@ -56,7 +56,7 @@ export function SettingsScreen() {
       <Section title="Экран">
         <Toggle label="Не гасить экран во время игры" checked={settings.keepAwake}
           onChange={(v) => update({ keepAwake: v })} />
-        <Toggle label="Горизонтально во весь экран в играх" checked={settings.landscapeGames}
+        <Toggle label="Крутилочка горизонтально во весь экран" checked={settings.landscapeGames}
           onChange={(v) => update({ landscapeGames: v })} />
       </Section>
 

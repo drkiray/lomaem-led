@@ -99,13 +99,11 @@ test('replay in own-words mode returns to setup with the same teams instead of r
   expect(JSON.parse(localStorage.getItem('ll.hat.replay')!)).toEqual({ teams, mode: 'own' });
 });
 
-test('offers landscape fullscreen on start', async () => {
-  const fs = stubFullscreen();
+test('stays portrait: no landscape prompt', () => {
+  stubFullscreen();
   save();
   renderWithProviders(<HatGameScreen />);
-  expect(screen.getByRole('dialog', { name: 'Поворачиваем экран' })).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: 'Включить' }));
-  expect(fs.requestFullscreen).toHaveBeenCalled();
-  expect(screen.getByRole('heading', { name: 'Объясняем словами' })).toBeInTheDocument();
+  expect(screen.queryByRole('dialog', { name: 'Поворачиваем экран' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Во весь экран' })).toBeNull();
   unstubFullscreen();
 });

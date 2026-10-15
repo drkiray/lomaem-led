@@ -96,28 +96,26 @@ function TimerRing({ remainingMs, totalMs }: { remainingMs: number; totalMs: num
 export function PlayingView({ state, onGuess, onSkip }: { state: HatState; onGuess: () => void; onSkip: () => void }) {
   const guessed = state.turn.filter((e) => e.guessed).length;
   return (
-    <div className="hat-view hat-view--play">
-      <span className="team-badge hat-play__aside" style={teamStyle(currentTeam(state))}>
+    <div className="hat-view">
+      <span className="team-badge" style={teamStyle(currentTeam(state))}>
         {currentExplainer(state)} · {currentTeam(state).name}
       </span>
-      <div className="hat-play__aside">
-        <TimerRing remainingMs={state.remainingMs} totalMs={state.config.turnSeconds * 1000} />
-      </div>
+      <TimerRing remainingMs={state.remainingMs} totalMs={state.config.turnSeconds * 1000} />
       <div className="word-card" aria-live="polite">{state.hat[0]}</div>
       <div className="hat-play__actions">
         <Button variant="ghost" onClick={onSkip}>Пропуск</Button>
         <Button onClick={onGuess}>Угадали ✓</Button>
       </div>
-      <p className="muted hat-play__aside">Угадано за ход: {guessed}</p>
+      <p className="muted">Угадано за ход: {guessed}</p>
     </div>
   );
 }
 
 export function LastWordView({ state, onGuess, onMiss }: { state: HatState; onGuess: () => void; onMiss: () => void }) {
   return (
-    <div className="hat-view hat-view--play">
-      <h2 className="hat-view__title hat-play__aside">Время вышло!</h2>
-      <p className="muted hat-play__aside">Последняя попытка: {seconds(state.lastWordMs)} сек</p>
+    <div className="hat-view">
+      <h2 className="hat-view__title">Время вышло!</h2>
+      <p className="muted">Последняя попытка: {seconds(state.lastWordMs)} сек</p>
       <div className="word-card">{state.hat[0]}</div>
       <div className="hat-play__actions">
         <Button variant="ghost" onClick={onMiss}>Не успели</Button>
