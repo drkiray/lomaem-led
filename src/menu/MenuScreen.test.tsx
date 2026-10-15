@@ -21,3 +21,19 @@ test('opens game setup and settings', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Настройки' }));
   expect(navigate).toHaveBeenCalledWith('settings');
 });
+
+test('Нетворкинг shows its own icon instead of an emoji', () => {
+  renderWithProviders(<MenuScreen />);
+  const card = screen.getByRole('button', { name: /Нетворкинг/ });
+  expect(card.querySelector('img.game-card__icon')).not.toBeNull();
+  expect(card).not.toHaveTextContent('🤝');
+});
+
+test('credits link the author in Telegram', () => {
+  renderWithProviders(<MenuScreen />);
+  expect(screen.getByText(/игру сделал вот этот/)).toBeInTheDocument();
+  const link = screen.getByRole('link', { name: 'крендель' });
+  expect(link).toHaveAttribute('href', 'https://t.me/kirayslifes');
+  expect(link).toHaveAttribute('target', '_blank');
+  expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+});

@@ -29,7 +29,11 @@ export function MenuScreen() {
                 disabled={locked}
                 onClick={() => game.route && navigate(game.route)}
               >
-                <span className="game-card__emoji" aria-hidden="true">{game.emoji}</span>
+                {game.icon ? (
+                  <img className="game-card__icon" src={game.icon} alt="" />
+                ) : (
+                  <span className="game-card__emoji" aria-hidden="true">{game.emoji}</span>
+                )}
                 <span className="game-card__text">
                   <span className="game-card__title">{game.title}</span>
                   <span className="game-card__subtitle">{game.subtitle}</span>
@@ -40,6 +44,10 @@ export function MenuScreen() {
           );
         })}
       </ul>
+      <p className="menu__credit">
+        игру сделал вот этот{' '}
+        <a href="https://t.me/kirayslifes" target="_blank" rel="noopener noreferrer">крендель</a>
+      </p>
     </div>
   );
 }
