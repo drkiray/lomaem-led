@@ -3,6 +3,7 @@ import { MenuScreen } from '../menu/MenuScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { SpinnerGameScreen } from '../games/spinner/SpinnerGameScreen';
 import { SpinnerSetupScreen } from '../games/spinner/SpinnerSetupScreen';
+import { HatSetupScreen } from '../games/hat/HatSetupScreen';
 import { ComingSoon } from './ComingSoon';
 import type { RouteName } from './nav';
 
@@ -11,6 +12,6 @@ export const SCREENS: Record<RouteName, ComponentType> = {
   settings: SettingsScreen,
   'spinner-setup': SpinnerSetupScreen,
   'spinner-game': SpinnerGameScreen,
-  'hat-setup': ComingSoon,
+  'hat-setup': HatSetupScreen,
   'hat-game': ComingSoon,
 };
