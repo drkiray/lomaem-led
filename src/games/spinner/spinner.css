@@ -52,11 +52,12 @@
 .setup-options summary { padding: 12px 0; font-weight: 700; color: var(--ice); }
 
 /* Phone on its side: wheel on the left, everything else on the right, all of
-   it inside one screen — the wheel is sized from the height left by .app's padding. */
+   it inside one screen — the wheel is sized from the height left by .app's padding.
+   No overflow clipping here: it would cut the glows of the wheel and the pills. */
 @media (orientation: landscape) and (max-height: 600px) {
   .spinner-game {
     --fit: calc(100dvh - var(--pad-top) - var(--pad-bottom));
-    height: var(--fit); min-height: 0; overflow: hidden;
+    height: var(--fit); min-height: 0;
     display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; row-gap: 8px;
     grid-template-areas: 'wheel header' 'wheel level' 'wheel turn' 'wheel hint';
     grid-template-rows: auto auto 1fr auto; align-items: center;
@@ -64,6 +65,7 @@
   .spinner-game__header { grid-area: header; }
   .spinner-game__level { grid-area: level; }
   .spinner-game__turn { grid-area: turn; font-size: 28px; }
-  .spinner-game > .wheel { grid-area: wheel; width: min(var(--fit), 55vw); }
+  /* 28px short of the full height leaves room for the wheel's glow at the screen edge */
+  .spinner-game > .wheel { grid-area: wheel; width: min(calc(var(--fit) - 28px), 55vw); margin-left: 14px; }
   .spinner-game__hint { grid-area: hint; margin: 0; }
 }
