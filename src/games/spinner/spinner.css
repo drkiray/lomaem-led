@@ -1,0 +1,43 @@
+.wheel { position: relative; width: min(100%, 520px); aspect-ratio: 1; margin: 0 auto; }
+.wheel__svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 22px rgba(127, 231, 255, 0.25)); }
+.wheel__sector path { stroke: #050a14; stroke-width: 2; }
+.wheel__label { fill: #04121f; font-family: var(--font-display); font-weight: 600; pointer-events: none; }
+.wheel__active {
+  fill: rgba(255, 255, 255, 0.28);
+  stroke: #ffffff; stroke-width: 4;
+  animation: sector-pulse 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.wheel__rim { fill: none; stroke: var(--ice); stroke-width: 3; opacity: 0.8; }
+.wheel__arrow path { fill: #ffffff; stroke: var(--ice); stroke-width: 2; }
+.wheel__hub {
+  position: absolute; left: 50%; top: 50%; width: 26%; aspect-ratio: 1;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  border: 3px solid var(--ice);
+  background: radial-gradient(circle at 35% 30%, #1d3f66, #07111f 70%);
+  color: var(--ice); font-family: var(--font-display); font-weight: 800; font-size: clamp(14px, 4.5vw, 20px);
+  box-shadow: var(--ice-glow), inset 0 0 18px rgba(127, 231, 255, 0.35);
+}
+.wheel__hub:not(:disabled) { animation: hub-pulse 1.6s ease-in-out infinite; }
+.wheel__hub:disabled { opacity: 0.75; }
+@keyframes sector-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+@keyframes hub-pulse { 0%, 100% { box-shadow: var(--ice-glow); } 50% { box-shadow: 0 0 34px rgba(127, 231, 255, 0.9); } }
+
+.spinner-game { display: flex; flex-direction: column; gap: 14px; min-height: calc(100dvh - 32px); }
+.spinner-game__header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.level-pills { display: flex; gap: 8px; }
+.level-pill {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  font-family: var(--font-display); font-weight: 600; color: var(--muted);
+}
+.level-pill.is-active { background: var(--ice); color: #021320; box-shadow: var(--ice-glow); }
+.level-pill:disabled:not(.is-active) { opacity: 0.4; }
+.spinner-game__level { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }
+.spinner-game__turn { margin: 0; text-align: center; font-size: 22px; font-family: var(--font-display); font-weight: 600; }
+.spinner-game__turn b { color: var(--ice); text-shadow: var(--ice-glow); }
+.spin-card__names { margin: 0; font-size: 18px; text-align: center; }
+.spin-card__names b { color: var(--ice); }
+.spin-card__text { margin: 0; font-size: 22px; line-height: 1.35; font-weight: 700; text-align: center; }
+.setup-options { padding: 4px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
+.setup-options summary { padding: 12px 0; font-weight: 700; color: var(--ice); }
