@@ -59,3 +59,9 @@ test('lines keep pathLength scaling so they grow instead of showing dotted at on
     expect(p.getAttribute('vector-effect')).toBeNull();
   }
 });
+
+test('no crack when the screen opts out (game screens)', () => {
+  const { container } = render(<ScreenTransition routeKey="spinner-game" crack={false}><p>Игра</p></ScreenTransition>);
+  settle(container);
+  expect(container.querySelector('.ice-crack')).toBeNull();
+});

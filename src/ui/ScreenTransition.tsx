@@ -5,7 +5,12 @@ import { IceCrack } from './IceCrack';
 // ice behind it. The crack starts
 // when the screen's own fade-in ends: while the screen is still translucent,
 // the frosted panels cannot hide it and it would show through buttons and text.
-export function ScreenTransition({ routeKey, children }: { routeKey: string; children: ReactNode }) {
+export function ScreenTransition({ routeKey, crack = true, children }: {
+  routeKey: string;
+  /** false on screens where the cracking would distract (games in play) */
+  crack?: boolean;
+  children: ReactNode;
+}) {
   const [settledKey, setSettledKey] = useState<string | null>(null);
 
   const onAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
@@ -14,7 +19,7 @@ export function ScreenTransition({ routeKey, children }: { routeKey: string; chi
 
   return (
     <>
-      {settledKey === routeKey && <IceCrack key={`crack-${routeKey}`} />}
+      {crack && settledKey === routeKey && <IceCrack key={`crack-${routeKey}`} />}
       <div key={routeKey} className="screen-enter" onAnimationEnd={onAnimationEnd}>
         {children}
       </div>

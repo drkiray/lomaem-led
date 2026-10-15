@@ -15,3 +15,7 @@ export const SCREENS: Record<RouteName, ComponentType> = {
   'hat-setup': HatSetupScreen,
   'hat-game': HatGameScreen,
 };
+
+// No ice cracking while a game is being played: it would distract the players.
+const NO_CRACK: ReadonlySet<RouteName> = new Set<RouteName>(['spinner-game', 'hat-game']);
+export const showsCrack = (route: RouteName) => !NO_CRACK.has(route);
