@@ -22,6 +22,7 @@ export interface Settings {
   musicVolume: number;
   vibration: boolean;
   keepAwake: boolean;
+  landscapeGames: boolean;
   spinner: SpinnerSettings;
   hat: HatSettings;
 }
@@ -36,6 +37,7 @@ export const DEFAULT_SETTINGS: Settings = {
   musicVolume: 0,
   vibration: true,
   keepAwake: true,
+  landscapeGames: true,
   spinner: { spinDurationSec: 4, actionRatio: 0.3 },
   hat: {
     turnSeconds: 60,

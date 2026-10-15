@@ -1,9 +1,10 @@
 .wheel { position: relative; width: min(100%, 520px); aspect-ratio: 1; margin: 0 auto; }
 .wheel__svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 22px rgba(127, 231, 255, 0.25)); }
-.wheel__sector path { stroke: #050a14; stroke-width: 2; }
+/* Sectors are dimmed so the pulsing highlight of the spinner's sector stands out. */
+.wheel__sector path { stroke: #050a14; stroke-width: 2; fill-opacity: 0.68; }
 .wheel__label { fill: #04121f; font-family: var(--font-display); font-weight: 600; pointer-events: none; }
 .wheel__active {
-  fill: rgba(255, 255, 255, 0.12);
+  fill: rgba(255, 255, 255, 0.2);
   stroke: #ffffff; stroke-width: 4;
   animation: sector-pulse 1.2s ease-in-out infinite;
   pointer-events: none;
@@ -41,3 +42,17 @@
 .spin-card__text { margin: 0; font-size: 22px; line-height: 1.35; font-weight: 700; text-align: center; }
 .setup-options { padding: 4px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
 .setup-options summary { padding: 12px 0; font-weight: 700; color: var(--ice); }
+
+/* Phone on its side: wheel on the left, everything else on the right. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .spinner-game {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; row-gap: 10px;
+    grid-template-areas: 'wheel header' 'wheel level' 'wheel turn' 'wheel hint';
+    grid-template-rows: auto auto 1fr auto; align-items: center;
+  }
+  .spinner-game__header { grid-area: header; }
+  .spinner-game__level { grid-area: level; }
+  .spinner-game__turn { grid-area: turn; font-size: 28px; }
+  .spinner-game > .wheel { grid-area: wheel; width: min(calc(100dvh - 32px), 55vw); }
+  .spinner-game__hint { grid-area: hint; margin: 0; }
+}

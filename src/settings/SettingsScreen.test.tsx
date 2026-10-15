@@ -13,6 +13,14 @@ test('toggles vibration and keep-awake', async () => {
   expect(stored().keepAwake).toBe(false);
 });
 
+test('toggles landscape mode for games', async () => {
+  renderWithProviders(<SettingsScreen />);
+  const toggle = screen.getByRole('switch', { name: /Горизонтально во весь экран/ });
+  expect(toggle).toHaveAttribute('aria-checked', 'true');
+  await userEvent.click(toggle);
+  expect(stored().landscapeGames).toBe(false);
+});
+
 test('changes hat turn time via segmented control', async () => {
   renderWithProviders(<SettingsScreen />);
   await userEvent.click(screen.getByRole('button', { name: '30с' }));

@@ -1,6 +1,7 @@
 import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test/render';
+import { stubFullscreen, unstubFullscreen } from '../../test/fullscreen';
 import { HatGameScreen } from './HatGameScreen';
 import { createHatGame, type HatState } from './state';
 import type { Team } from './teams';
@@ -96,4 +97,15 @@ test('replay in own-words mode returns to setup with the same teams instead of r
   expect(navigate).toHaveBeenCalledWith('hat-setup', { replace: true });
   expect(localStorage.getItem('ll.hat.game')).toBeNull();
   expect(JSON.parse(localStorage.getItem('ll.hat.replay')!)).toEqual({ teams, mode: 'own' });
+});
+
+test('offers landscape fullscreen on start', async () => {
+  const fs = stubFullscreen();
+  save();
+  renderWithProviders(<HatGameScreen />);
+  expect(screen.getByRole('dialog', { name: 'Поворачиваем экран' })).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Включить' }));
+  expect(fs.requestFullscreen).toHaveBeenCalled();
+  expect(screen.getByRole('heading', { name: 'Объясняем словами' })).toBeInTheDocument();
+  unstubFullscreen();
 });

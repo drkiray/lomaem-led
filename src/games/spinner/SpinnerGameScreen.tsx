@@ -3,9 +3,11 @@ import { useNav } from '../../app/nav';
 import { useFeedback } from '../../audio/useFeedback';
 import { SPINNER_CARDS } from '../../content/spinnerCards';
 import { KEYS, loadJSON, removeKey, saveJSON } from '../../lib/storage';
+import { useLandscape } from '../../lib/useLandscape';
 import { useWakeLock } from '../../lib/useWakeLock';
 import { useSettings } from '../../settings/SettingsContext';
 import { Button } from '../../ui/Button';
+import { FullscreenButton, LandscapePrompt } from '../../ui/LandscapePrompt';
 import { Modal } from '../../ui/Modal';
 import { Screen } from '../../ui/Screen';
 import { LEVELS, fillTemplate, pickCard, type Level } from './deck';
@@ -43,6 +45,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   const { arrowRef, spinTo, setRotation } = useSpin(state.players.length, () => fx.sfx('tick'));
 
   useWakeLock(settings.keepAwake);
+  const landscape = useLandscape(settings.landscapeGames);
 
   useEffect(() => {
     saveJSON(KEYS.spinnerGame, state);
@@ -108,7 +111,10 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
             </button>
           ))}
         </div>
-        <button type="button" className="icon-btn" aria-label="Завершить" onClick={() => setConfirmExit(true)}>✕</button>
+        <div className="game-header__actions">
+          <FullscreenButton landscape={landscape} />
+          <button type="button" className="icon-btn" aria-label="Завершить" onClick={() => setConfirmExit(true)}>✕</button>
+        </div>
       </header>
 
       <p className="spinner-game__level">
@@ -125,7 +131,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         disabled={state.phase !== 'ready'}
         onSpin={spin}
       />
-      <p className="muted center">{state.phase === 'ready' ? `${asker}, жми на центр круга` : ' '}</p>
+      <p className="muted center spinner-game__hint">{state.phase === 'ready' ? `${asker}, жми на центр круга` : ' '}</p>
 
       <Modal
         open={state.phase === 'card' && card !== null}
@@ -184,6 +190,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
       >
         <p>Прогресс этой партии будет удалён.</p>
       </Modal>
+      <LandscapePrompt landscape={landscape} />
     </div>
   );
 }
