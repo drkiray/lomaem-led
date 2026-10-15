@@ -18,7 +18,7 @@ import { useSpin } from './useSpin';
 import { Wheel } from './Wheel';
 import './spinner.css';
 
-const LEVEL_TITLES: Record<Level, string> = { 1: 'Знакомство', 2: 'Глубже', 3: 'Психология' };
+const LEVEL_TITLES: Record<Level, string> = { 1: 'Поверхность', 2: 'Погружение', 3: 'Глубина' };
 
 export function SpinnerGameScreen() {
   const { navigate, back } = useNav();
