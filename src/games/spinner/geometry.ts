@@ -51,10 +51,27 @@ export function sectorColor(i: number, n: number): string {
   return SECTOR_COLORS[i % len];
 }
 
+// The hub button is 26% of the wheel width (see .wheel__hub in spinner.css).
+export const HUB_RADIUS = WHEEL_SIZE * 0.13;
+const GLYPH_EM = 0.72; // average Unbounded Cyrillic advance width
+const MIN_SHRUNK_FONT = 11;
+// Labels end near the rim (0.9R) and must stop short of the hub.
+const LABEL_SPACE = WHEEL_RADIUS * 0.9 - HUB_RADIUS - 4;
+
+const charsThatFit = (fontSize: number) => Math.floor(LABEL_SPACE / (fontSize * GLYPH_EM));
+
 export function labelLayout(n: number): { fontSize: number; maxChars: number } {
   const fontSize = Math.max(9, Math.min(22, Math.round(26 - n * 0.7)));
-  const maxChars = Math.floor((WHEEL_RADIUS * 0.66) / (fontSize * 0.58));
-  return { fontSize, maxChars };
+  return { fontSize, maxChars: charsThatFit(fontSize) };
+}
+
+// Long names first shrink (down to 11, never above the wheel's base size),
+// then get truncated with «…».
+export function fitLabel(name: string, n: number): { text: string; fontSize: number } {
+  const base = labelLayout(n).fontSize;
+  const fitting = Math.floor(LABEL_SPACE / (Math.max(1, name.length) * GLYPH_EM));
+  const fontSize = Math.max(Math.min(base, MIN_SHRUNK_FONT), Math.min(base, fitting));
+  return { text: truncateLabel(name, charsThatFit(fontSize)), fontSize };
 }
 
 export function truncateLabel(name: string, maxChars: number): string {

@@ -1,6 +1,6 @@
 import { mulberry32 } from '../../lib/random';
 import {
-  computeStopRotation, easeOutQuart, labelLayout, labelPlacement, normalizeDeg,
+  HUB_RADIUS, WHEEL_RADIUS, computeStopRotation, easeOutQuart, fitLabel, labelLayout, labelPlacement, normalizeDeg,
   sectorAtRotation, sectorColor, sectorPath, truncateLabel,
 } from './geometry';
 
@@ -69,4 +69,24 @@ test('truncateLabel', () => {
 test('labels on the left half are flipped to stay upright', () => {
   expect(labelPlacement(0, 4).anchor).toBe('end');
   expect(labelPlacement(3, 4).anchor).toBe('start');
+});
+
+describe('fitLabel keeps names clear of the hub', () => {
+  const GLYPH = 0.72; // Unbounded Cyrillic average advance, in em
+  const endRadius = (text: string, fontSize: number) => WHEEL_RADIUS * 0.9 - text.length * fontSize * GLYPH;
+
+  test.each([2, 3, 4, 8, 12, 20, 30, 40])('n=%i: long name never reaches the hub', (n) => {
+    const { text, fontSize } = fitLabel('Константинопольская', n);
+    expect(endRadius(text, fontSize)).toBeGreaterThanOrEqual(HUB_RADIUS + 4);
+  });
+
+  test('a 10-letter name fits whole on a small wheel by shrinking the font', () => {
+    const { text, fontSize } = fitLabel('Александра', 4);
+    expect(text).toBe('Александра');
+    expect(fontSize).toBeLessThan(labelLayout(4).fontSize);
+  });
+
+  test('short names keep the base font', () => {
+    expect(fitLabel('Аня', 4)).toEqual({ text: 'Аня', fontSize: labelLayout(4).fontSize });
+  });
 });

@@ -1,7 +1,6 @@
 import type { RefObject } from 'react';
 import {
-  WHEEL_CENTER, WHEEL_RADIUS, WHEEL_SIZE, labelLayout, labelPlacement,
-  sectorColor, sectorPath, truncateLabel,
+  WHEEL_CENTER, WHEEL_RADIUS, WHEEL_SIZE, fitLabel, labelPlacement, sectorColor, sectorPath,
 } from './geometry';
 import './spinner.css';
 
@@ -19,7 +18,6 @@ const ARROW_PATH = `M${C} ${TIP} L${C + 16} ${C - 20} L${C + 7} ${C - 18} L${C +
 
 export function Wheel({ players, activeIndex, arrowRef, disabled, onSpin }: Props) {
   const n = players.length;
-  const { fontSize, maxChars } = labelLayout(n);
 
   return (
     <div className="wheel">
@@ -35,6 +33,7 @@ export function Wheel({ players, activeIndex, arrowRef, disabled, onSpin }: Prop
         </defs>
         {players.map((name, i) => {
           const label = labelPlacement(i, n);
+          const { text, fontSize } = fitLabel(name, n);
           return (
             <g key={i} className="wheel__sector">
               <path d={sectorPath(i, n)} fill={sectorColor(i, n)} />
@@ -47,7 +46,7 @@ export function Wheel({ players, activeIndex, arrowRef, disabled, onSpin }: Prop
                 dominantBaseline="middle"
                 fontSize={fontSize}
               >
-                {truncateLabel(name, maxChars)}
+                {text}
               </text>
             </g>
           );
