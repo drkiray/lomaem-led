@@ -31,6 +31,8 @@ export function Wheel({ players, activeIndex, arrowRef, disabled, onSpin }: Prop
             </feMerge>
           </filter>
         </defs>
+        {/* opaque backing: the dimmed sectors would let the ice cracks show through */}
+        <circle className="wheel__backing" cx={C} cy={C} r={WHEEL_RADIUS} />
         {players.map((name, i) => {
           const label = labelPlacement(i, n);
           const { text, fontSize } = fitLabel(name, n);

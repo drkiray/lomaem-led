@@ -4,87 +4,84 @@ import type { Rng } from '../lib/random';
 // angles stay true on a phone instead of being stretched like a 100×100 box.
 export const CRACK_W = 100;
 export const CRACK_H = 200;
+/** the ice keeps cracking for this long after a screen opens */
+export const CRACK_DURATION_S = 25;
+
+const SPEED = 5; // box units per second — a slow creep
+const FIRST_START_S = 0.8; // nothing is drawn when the screen opens
+const LAST_START_S = 11;
+const MAX_PATHS = 90;
 
 export interface CrackPath {
   d: string;
   width: number;
+  /** seconds after the screen settles when this line starts to grow */
   delay: number;
+  /** seconds it takes to grow to full length */
+  duration: number;
 }
 
 type Point = [number, number];
 
 const between = (rng: Rng, min: number, max: number) => min + rng() * (max - min);
 const fmt = (n: number) => n.toFixed(1);
-const inside = ([x, y]: Point, margin = 10) =>
+const inside = ([x, y]: Point, margin: number) =>
   x >= -margin && x <= CRACK_W + margin && y >= -margin && y <= CRACK_H + margin;
 
-// One jagged line; at some vertices it forks a thinner, later-drawn branch.
-function walk(rng: Rng, out: CrackPath[], from: Point, angle: number, steps: number, stepLen: number,
-  width: number, delay: number, depth: number): Point[] {
+// One jagged line growing from `from`; along the way it forks thinner
+// branches that start growing once this line reaches the fork.
+function grow(rng: Rng, out: CrackPath[], from: Point, angle: number, steps: number, stepLen: number,
+  width: number, delay: number, depth: number) {
   const pts: Point[] = [from];
-  const forks: CrackPath[] = [];
+  const forks: { at: Point; angle: number; lenAt: number }[] = [];
   let [x, y] = from;
+  let length = 0;
   for (let i = 0; i < steps; i++) {
-    angle += between(rng, -0.45, 0.45);
-    const len = stepLen * between(rng, 0.6, 1.4);
-    x += Math.cos(angle) * len;
-    y += Math.sin(angle) * len;
+    angle += between(rng, -0.35, 0.35);
+    const seg = stepLen * between(rng, 0.6, 1.4);
+    x += Math.cos(angle) * seg;
+    y += Math.sin(angle) * seg;
+    length += seg;
     pts.push([x, y]);
-    if (!inside([x, y])) break;
-    if (depth < 2 && i < steps - 1 && inside([x, y], 0) && rng() < 0.3) {
-      const side = rng() < 0.5 ? -1 : 1;
-      walk(rng, forks, [x, y], angle + side * between(rng, 0.5, 1.2), Math.max(2, Math.round(steps * 0.45)),
-        stepLen * 0.7, width * 0.6, delay + 0.05 * (i + 1), depth + 1);
+    if (!inside([x, y], 2)) break;
+    if (depth < 2 && i < steps - 1 && inside([x, y], -1) && rng() < 0.25) {
+      forks.push({ at: [x, y], angle: angle + (rng() < 0.5 ? -1 : 1) * between(rng, 0.5, 1.1), lenAt: length });
     }
   }
-  out.push({ d: 'M' + pts.map(([px, py]) => `${fmt(px)} ${fmt(py)}`).join(' L'), width, delay }, ...forks);
-  return pts;
-}
-
-// A point on a random screen edge and the direction from it towards the
-// middle, so a crack starting near a corner still heads into view.
-function edgePoint(rng: Rng): { at: Point; inward: number } {
-  let at: Point;
-  switch (Math.floor(rng() * 4)) {
-    case 0: at = [between(rng, 0, CRACK_W), 0]; break;
-    case 1: at = [CRACK_W, between(rng, 0, CRACK_H)]; break;
-    case 2: at = [between(rng, 0, CRACK_W), CRACK_H]; break;
-    default: at = [0, between(rng, 0, CRACK_H)];
+  const duration = Math.min(length / SPEED, CRACK_DURATION_S - delay);
+  out.push({ d: 'M' + pts.map(([px, py]) => `${fmt(px)} ${fmt(py)}`).join(' L'), width, delay, duration });
+  for (const fork of forks) {
+    const forkDelay = delay + duration * (fork.lenAt / length);
+    if (forkDelay > CRACK_DURATION_S - 1) continue;
+    grow(rng, out, fork.at, fork.angle, Math.max(2, Math.round(steps * 0.5)), stepLen * 0.75, width * 0.65, forkDelay,
+      depth + 1);
   }
-  const target: Point = [between(rng, 0.3, 0.7) * CRACK_W, between(rng, 0.3, 0.7) * CRACK_H];
-  return { at, inward: Math.atan2(target[1] - at[1], target[0] - at[0]) };
 }
 
-// Three kinds of fracture, each randomised: a star from a point of impact,
-// a few cracks creeping in from an edge, or one long fissure across the ice.
+// A point at `distance` along the screen's perimeter, clockwise from the top-left corner.
+function perimeterPoint(distance: number): Point {
+  const perimeter = 2 * (CRACK_W + CRACK_H);
+  const d = ((distance % perimeter) + perimeter) % perimeter;
+  if (d < CRACK_W) return [d, 0];
+  if (d < CRACK_W + CRACK_H) return [CRACK_W, d - CRACK_W];
+  if (d < 2 * CRACK_W + CRACK_H) return [CRACK_W - (d - CRACK_W - CRACK_H), CRACK_H];
+  return [0, CRACK_H - (d - 2 * CRACK_W - CRACK_H)];
+}
+
+// Cracks creep in from all around the screen edge at different moments and
+// grow towards the middle, slowly covering the whole screen.
 export function generateCracks(rng: Rng): CrackPath[] {
   const out: CrackPath[] = [];
-  const kind = rng();
-  if (kind < 0.4) {
-    const at: Point = [between(rng, 10, CRACK_W - 10), between(rng, 15, CRACK_H - 15)];
-    const arms = 3 + Math.floor(rng() * 3);
-    const turn = rng() * Math.PI * 2;
-    for (let i = 0; i < arms; i++) {
-      const angle = turn + (i / arms) * Math.PI * 2 + between(rng, -0.4, 0.4);
-      walk(rng, out, at, angle, 3 + Math.floor(rng() * 4), between(rng, 9, 16), 1, between(rng, 0, 0.06), 0);
-    }
-  } else if (kind < 0.75) {
-    const { at, inward } = edgePoint(rng);
-    const arms = 2 + Math.floor(rng() * 3);
-    for (let i = 0; i < arms; i++) {
-      walk(rng, out, at, inward + between(rng, -0.8, 0.8), 4 + Math.floor(rng() * 4), between(rng, 10, 18), 1,
-        between(rng, 0, 0.1), 0);
-    }
-  } else {
-    const { at, inward } = edgePoint(rng);
-    const main = walk(rng, out, at, inward + between(rng, -0.35, 0.35), 9 + Math.floor(rng() * 4),
-      between(rng, 14, 22), 1.1, 0, 0);
-    const visible = main.filter((p) => inside(p, 0));
-    for (let i = 0, n = 2 + Math.floor(rng() * 2); i < n && visible.length > 1; i++) {
-      const k = 1 + Math.floor(rng() * (visible.length - 1));
-      walk(rng, out, visible[k], inward + (rng() < 0.5 ? -1 : 1) * between(rng, 0.8, 1.6), 2 + Math.floor(rng() * 3),
-        between(rng, 7, 12), 0.6, 0.06 * k, 1);
-    }
+  const perimeter = 2 * (CRACK_W + CRACK_H);
+  const count = 10 + Math.floor(rng() * 5);
+  const spacing = perimeter / count;
+  const offset = rng() * perimeter;
+  for (let i = 0; i < count; i++) {
+    const at = perimeterPoint(offset + i * spacing + between(rng, -0.3, 0.3) * spacing);
+    const target: Point = [between(rng, 0.15, 0.85) * CRACK_W, between(rng, 0.1, 0.9) * CRACK_H];
+    const angle = Math.atan2(target[1] - at[1], target[0] - at[0]);
+    grow(rng, out, at, angle, 7 + Math.floor(rng() * 5), between(rng, 9, 15), 1,
+      between(rng, FIRST_START_S, LAST_START_S), 0);
   }
-  return out.slice(0, 24);
+  return out.slice(0, MAX_PATHS);
 }

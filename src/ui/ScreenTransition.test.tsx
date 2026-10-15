@@ -7,10 +7,24 @@ const shape = (c: HTMLElement) => [...c.querySelectorAll('.ice-crack path')].map
 // still translucent the crack would show through buttons and text.
 const settle = (c: HTMLElement) => fireEvent.animationEnd(c.querySelector('.screen-enter')!);
 
+test('every screen, the first one too, cracks once it has settled', () => {
+  const { container } = render(<ScreenTransition routeKey="menu"><p>Меню</p></ScreenTransition>);
+  expect(container.querySelector('.ice-crack')).toBeNull();
+  settle(container);
+  expect(container.querySelector('.ice-crack')).not.toBeNull();
+});
+
+test('each line grows on its own schedule', () => {
+  const { container } = render(<ScreenTransition routeKey="menu"><p>Меню</p></ScreenTransition>);
+  settle(container);
+  const path = container.querySelector<SVGPathElement>('.ice-crack path')!;
+  expect(path.style.animationDelay).toMatch(/s$/);
+  expect(path.style.animationDuration).toMatch(/s$/);
+});
+
 test('crack appears only after the screen has settled, behind the content', () => {
   const { container, rerender } = render(<ScreenTransition routeKey="menu"><p>Меню</p></ScreenTransition>);
   settle(container);
-  expect(container.querySelector('.ice-crack')).toBeNull();
 
   rerender(<ScreenTransition routeKey="settings"><p>Настройки</p></ScreenTransition>);
   expect(container.querySelector('.ice-crack')).toBeNull();
@@ -35,4 +49,13 @@ test('a new pattern on each transition', () => {
   rerender(<ScreenTransition routeKey="menu"><p>Меню</p></ScreenTransition>);
   settle(container);
   expect(shape(container)).not.toBe(first);
+});
+
+test('lines keep pathLength scaling so they grow instead of showing dotted at once', () => {
+  const { container } = render(<ScreenTransition routeKey="menu"><p>Меню</p></ScreenTransition>);
+  settle(container);
+  for (const p of container.querySelectorAll('.ice-crack path')) {
+    expect(p.getAttribute('pathLength')).toBe('1');
+    expect(p.getAttribute('vector-effect')).toBeNull();
+  }
 });
