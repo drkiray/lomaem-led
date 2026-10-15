@@ -3,7 +3,7 @@
 .wheel__sector path { stroke: #050a14; stroke-width: 2; }
 .wheel__label { fill: #04121f; font-family: var(--font-display); font-weight: 600; pointer-events: none; }
 .wheel__active {
-  fill: rgba(255, 255, 255, 0.28);
+  fill: rgba(255, 255, 255, 0.12);
   stroke: #ffffff; stroke-width: 4;
   animation: sector-pulse 1.2s ease-in-out infinite;
   pointer-events: none;

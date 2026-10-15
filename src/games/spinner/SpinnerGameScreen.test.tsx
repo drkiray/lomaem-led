@@ -31,7 +31,7 @@ test('card shows asker → answerer and filled text; Готово passes the tur
   renderWithProviders(<SpinnerGameScreen />);
   const dialog = screen.getByRole('dialog', { name: 'Действие' });
   expect(dialog).toHaveTextContent('Маша → Петя');
-  expect(dialog).toHaveTextContent('Сделай Маша искренний комплимент');
+  expect(dialog).toHaveTextContent('Маша ждёт от тебя искренний комплимент');
   await userEvent.click(screen.getByRole('button', { name: 'Готово' }));
   expect(screen.getByText(/Крутит:/)).toHaveTextContent('Крутит: Петя');
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).turnIndex).toBe(1);

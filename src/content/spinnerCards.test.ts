@@ -31,6 +31,16 @@ test('only known placeholders, all substituted', () => {
   }
 });
 
+// Names are not declined, so a placeholder must never sit where Russian needs
+// an oblique case («с Маша», «Сделай Маша комплимент»).
+const OBLIQUE_BEFORE_NAME =
+  /(^|[\s(])(с|со|для|у|о|об|к|ко|честь|качество|опиши|сделай|предложи|подари|скажи|видишь|научи|покажи)\s+\{(asker|answerer)\}/i;
+
+test('names only appear in nominative-safe positions', () => {
+  const bad = SPINNER_CARDS.filter((c) => OBLIQUE_BEFORE_NAME.test(c.text)).map((c) => c.text);
+  expect(bad).toEqual([]);
+});
+
 test('questions end with a question mark', () => {
   for (const c of SPINNER_CARDS.filter((c) => c.kind === 'question')) expect(c.text.trim().endsWith('?')).toBe(true);
 });
