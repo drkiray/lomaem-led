@@ -63,8 +63,6 @@ export function SettingsScreen() {
       <Section title="Крутилочка">
         <Slider label="Длительность кручения" min={2} max={8} step={1} value={settings.spinner.spinDurationSec}
           format={sec} onChange={(v) => update({ spinner: { spinDurationSec: v } })} />
-        <Slider label="Доля действий" min={0} max={0.6} step={0.1} value={settings.spinner.actionRatio}
-          format={pct} onChange={(v) => update({ spinner: { actionRatio: v } })} />
         <Button variant="ghost" onClick={() => { removeKey(KEYS.spinnerSeen); setHistoryCleared(true); }}>
           {historyCleared ? 'История очищена ✓' : 'Сбросить историю вопросов'}
         </Button>
