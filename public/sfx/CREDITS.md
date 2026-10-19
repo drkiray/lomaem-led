@@ -11,10 +11,6 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 | tap.mp3 | click_003 |
 | stop.mp3 | drop_004 |
 | card.mp3 | Freesound 651514 «paper» by 1bob (CC0) |
-| countdown.mp3 | bong_001 |
-| correct.mp3 | confirmation_002 |
-| skip.mp3 | back_002 |
-| timeUp.mp3 | error_003 |
 | toggle.mp3 | Freesound 692828 «woodblock-soft» by hollandm (CC0) |
 
 ## Music
@@ -22,3 +18,5 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 `public/music/bg.mp3` — «Exotic Beauty» by FreeGroove, from Pixabay (https://pixabay.com),
 used under the Pixabay Content License (https://pixabay.com/service/license-summary/).
 Re-encoded to 128 kbps mp3 and edited for seamless looping (3 s end-to-start crossfade).
+
+Note: «correct», «skip», «timeUp» and «countdown» have no files of their own — they re-pitch `select.mp3` (kalimba) and `toggle.mp3` (woodblock) at runtime.

@@ -33,8 +33,9 @@ export const SFX_RECIPES: Record<SfxName, Tone[]> = {
   back: [{ freq: 440, dur: 0.1, type: 'sine', slideTo: 330, gain: 0.5 }],
 };
 
-// Recorded samples (public/sfx, Kenney «Interface Sounds», CC0). Several files
-// for one name are picked at random; `hits` replays the sample at offsets (s).
+// Recorded samples (public/sfx; see CREDITS.md). Several files for one name are
+// picked at random; `hits` replays the sample at offsets (s), each optionally
+// re-pitched by `hitPitches` (semitones) — that's how one kalimba note becomes a melody.
 // Until a sample is decoded — or if it fails to load — the synth recipe plays.
 interface Sample {
   files: string[];
@@ -42,16 +43,21 @@ interface Sample {
   jitter?: number; // ± random playback-rate spread, keeps rapid repeats from sounding mechanical
   pitches?: number[]; // semitone offsets; one is picked per play (never the same twice in a row)
   hits?: number[];
+  hitPitches?: number[]; // semitones per hit (same order as `hits`)
 }
 
 export const SFX_SAMPLES: Record<SfxName, Sample> = {
   tick: { files: ['spin-tick'], gain: 0.5, jitter: 0.08 },
   stop: { files: ['stop'], gain: 0.8 },
   card: { files: ['card'], gain: 0.7 },
-  correct: { files: ['correct'], gain: 0.8 },
-  skip: { files: ['skip'], gain: 0.7 },
-  timeUp: { files: ['timeUp'], gain: 1, hits: [0, 0.55] },
-  countdown: { files: ['countdown'], gain: 0.8 },
+  // kalimba arpeggio C–E–G going up: «угадали»
+  correct: { files: ['select'], gain: 0.8, hits: [0, 0.09, 0.18], hitPitches: [0, 4, 7] },
+  // soft low wood knock: «пропуск»
+  skip: { files: ['toggle'], gain: 0.9, hitPitches: [-7] },
+  // kalimba phrase falling G–E–C–G(low): «время вышло»
+  timeUp: { files: ['select'], gain: 1, hits: [0, 0.3, 0.6, 0.95], hitPitches: [7, 4, 0, -5] },
+  // quiet wood tick: 3-2-1
+  countdown: { files: ['toggle'], gain: 0.7, hitPitches: [-2] },
   tap: { files: ['tap'], gain: 0.5 },
   toggle: { files: ['toggle'], gain: 0.9 },
   // kalimba C note re-pitched along a pentatonic scale: any sequence sounds consonant
@@ -99,14 +105,13 @@ export function preloadSfx(): void {
     const audio = getContext();
     if (!audio?.decodeAudioData || typeof fetch !== 'function') return;
     loading = true;
-    for (const { files } of Object.values(SFX_SAMPLES)) {
-      for (const file of files) {
-        fetch(SAMPLE_URL(file))
-          .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
-          .then((data) => audio.decodeAudioData(data))
-          .then((buf) => void buffers.set(file, buf))
-          .catch(() => {}); // missing file → synth fallback
-      }
+    const unique = new Set(Object.values(SFX_SAMPLES).flatMap((sample) => sample.files));
+    for (const file of unique) {
+      fetch(SAMPLE_URL(file))
+        .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+        .then((data) => audio.decodeAudioData(data))
+        .then((buf) => void buffers.set(file, buf))
+        .catch(() => {}); // missing file → synth fallback
     }
   } catch {
     loading = false;
@@ -114,7 +119,7 @@ export function preloadSfx(): void {
 }
 
 function playSample(audio: AudioContext, name: SfxName, volume: number, position?: number): boolean {
-  const { files, gain, jitter, pitches, hits = [0] } = SFX_SAMPLES[name];
+  const { files, gain, jitter, pitches, hits = [0], hitPitches } = SFX_SAMPLES[name];
   const ready = files.filter((f) => buffers.has(f));
   if (!ready.length) return false;
   const buffer = buffers.get(ready[Math.floor(Math.random() * ready.length)])!;
@@ -125,16 +130,16 @@ function playSample(audio: AudioContext, name: SfxName, volume: number, position
     rate = 2 ** (semitones / 12);
   }
   const now = audio.currentTime;
-  for (const hit of hits) {
+  hits.forEach((hit, i) => {
     const src = audio.createBufferSource();
     const g = audio.createGain();
     src.buffer = buffer;
-    src.playbackRate.value = rate * (jitter ? 1 + (Math.random() * 2 - 1) * jitter : 1);
+    src.playbackRate.value = rate * 2 ** ((hitPitches?.[i] ?? 0) / 12) * (jitter ? 1 + (Math.random() * 2 - 1) * jitter : 1);
     g.gain.value = Math.min(1, volume * gain);
     src.connect(g);
     g.connect(audio.destination);
     src.start(now + hit);
-  }
+  });
   return true;
 }
 

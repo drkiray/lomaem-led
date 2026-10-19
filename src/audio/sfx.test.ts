@@ -44,7 +44,7 @@ test('plays one oscillator per tone in recipe', () => {
   expect(oscillators).toHaveLength(SFX_RECIPES.timeUp.length);
 });
 
-test('plays the decoded sample instead of the synth, replaying timeUp as two hits', async () => {
+test('plays the decoded sample instead of the synth, once per hit of the timeUp phrase', async () => {
   const { oscillators } = stubAudioContext();
   const sources: { start: ReturnType<typeof vi.fn> }[] = [];
   const decoded = {} as AudioBuffer;
@@ -67,7 +67,7 @@ test('plays the decoded sample instead of the synth, replaying timeUp as two hit
   await vi.waitFor(() => {
     oscillators.length = 0;
     playSfx('timeUp', 1);
-    expect(sources).toHaveLength(2);
+    expect(sources).toHaveLength(SFX_SAMPLES.timeUp.hits!.length);
   });
   expect(oscillators).toHaveLength(0);
 });
