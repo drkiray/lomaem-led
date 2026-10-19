@@ -1,10 +1,12 @@
 import { resetMusicForTests, setMusicVolume } from './music';
 
 function stubWebAudio(state: 'running' | 'suspended' = 'running') {
-  const node = { gain: { value: 1 }, connect: vi.fn() };
+  const param = { value: 0, cancelScheduledValues: vi.fn(), setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() };
+  const node = { gain: param, connect: vi.fn() };
   const sources: { loop: boolean; buffer: unknown; start: ReturnType<typeof vi.fn>; connect: ReturnType<typeof vi.fn> }[] = [];
   const ctx = {
     state,
+    currentTime: 0,
     destination: {},
     resume: vi.fn(() => {
       ctx.state = 'running';
@@ -41,10 +43,13 @@ test('positive volume starts one gapless looping source from the base url', asyn
   expect(sources).toHaveLength(1);
   expect(sources[0].loop).toBe(true);
   expect(sources[0].start).toHaveBeenCalled();
-  expect(node.gain.value).toBe(0.4);
+  // first start fades in from silence over a couple of seconds
+  expect(node.gain.linearRampToValueAtTime).toHaveBeenLastCalledWith(0.4, 2.5);
+  expect(await setMusicVolume(0.4)).toBe(true);
+  expect(node.gain.linearRampToValueAtTime).toHaveBeenCalledTimes(1); // retries don't restart the fade
   expect(await setMusicVolume(0.7)).toBe(true);
   expect(sources).toHaveLength(1); // volume change reuses the running source
-  expect(node.gain.value).toBe(0.7);
+  expect(node.gain.linearRampToValueAtTime).toHaveBeenLastCalledWith(0.7, 0.15); // quick, no long fade
 });
 
 test('blocked autoplay resolves false and a later gesture starts it', async () => {
@@ -66,6 +71,7 @@ test('turning the volume to 0 suspends playback', async () => {
   const { ctx, node } = stubWebAudio();
   await setMusicVolume(0.4);
   await setMusicVolume(0);
-  expect(node.gain.value).toBe(0);
+  expect(node.gain.linearRampToValueAtTime).toHaveBeenLastCalledWith(0, 0.15);
+  await new Promise((r) => setTimeout(r, 250));
   expect(ctx.suspend).toHaveBeenCalled();
 });
