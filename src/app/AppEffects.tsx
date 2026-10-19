@@ -27,7 +27,11 @@ export function AppEffects() {
       const el = (e.target as Element | null)?.closest<HTMLElement>('button, summary');
       if (!el || (el as HTMLButtonElement).disabled || el.closest('[data-sfx="none"]')) return;
       if (el.matches('[role="switch"], .segmented__item')) return; // play the toggle sound themselves
-      fx.sfx(clickSound(el));
+      // A real pointer press (detail > 0) tells us where on the button it landed;
+      // that picks the kalimba note. Keyboard activation has no position → random note.
+      const rect = el.getBoundingClientRect();
+      const position = e.detail > 0 && rect.width > 0 ? (e.clientX - rect.left) / rect.width : undefined;
+      fx.sfx(clickSound(el), position);
     };
     document.addEventListener('click', onClick, true);
     return () => document.removeEventListener('click', onClick, true);

@@ -1,4 +1,4 @@
-import { SFX_RECIPES, SFX_SAMPLES, pickPitch, playSfx, resetSfxForTests } from './sfx';
+import { SFX_RECIPES, SFX_SAMPLES, pickPitch, pitchAt, playSfx, resetSfxForTests } from './sfx';
 
 function stubAudioContext() {
   const oscillators: unknown[] = [];
@@ -95,4 +95,15 @@ test('pickPitch never repeats the previous pitch and stays inside the scale', ()
     last = p;
   }
   expect(pickPitch([3], 3)).toBe(3); // a one-note scale can't avoid repeating
+});
+
+test('pitchAt: left edge is the highest note, right edge the lowest, in between descends', () => {
+  const scale = SFX_SAMPLES.select.pitches!;
+  expect(pitchAt(scale, 0)).toBe(Math.max(...scale));
+  expect(pitchAt(scale, 1)).toBe(Math.min(...scale));
+  expect(pitchAt(scale, -3)).toBe(Math.max(...scale)); // clamped
+  expect(pitchAt(scale, 9)).toBe(Math.min(...scale));
+  const walked = Array.from({ length: 40 }, (_, i) => pitchAt(scale, i / 39));
+  expect(walked).toEqual([...walked].sort((a, b) => b - a)); // never rises going right
+  expect(new Set(walked).size).toBe(scale.length); // every note is reachable
 });

@@ -65,6 +65,14 @@ export function pickPitch(pitches: number[], last: number | undefined, rng: () =
   return options[Math.floor(rng() * options.length)];
 }
 
+// Maps a horizontal position (0 = left edge, 1 = right edge) onto the scale:
+// left is the highest note, right the lowest, like a kalimba laid out in front of you.
+export function pitchAt(pitches: number[], position: number): number {
+  const sorted = [...pitches].sort((a, b) => b - a);
+  const clamped = Math.min(1, Math.max(0, position));
+  return sorted[Math.min(sorted.length - 1, Math.floor(clamped * sorted.length))];
+}
+
 const lastPitch = new Map<SfxName, number>();
 
 const SAMPLE_URL = (file: string) => `${import.meta.env.BASE_URL}sfx/${file}.mp3`;
@@ -105,14 +113,14 @@ export function preloadSfx(): void {
   }
 }
 
-function playSample(audio: AudioContext, name: SfxName, volume: number): boolean {
+function playSample(audio: AudioContext, name: SfxName, volume: number, position?: number): boolean {
   const { files, gain, jitter, pitches, hits = [0] } = SFX_SAMPLES[name];
   const ready = files.filter((f) => buffers.has(f));
   if (!ready.length) return false;
   const buffer = buffers.get(ready[Math.floor(Math.random() * ready.length)])!;
   let rate = 1;
   if (pitches) {
-    const semitones = pickPitch(pitches, lastPitch.get(name));
+    const semitones = position === undefined ? pickPitch(pitches, lastPitch.get(name)) : pitchAt(pitches, position);
     lastPitch.set(name, semitones);
     rate = 2 ** (semitones / 12);
   }
@@ -130,13 +138,14 @@ function playSample(audio: AudioContext, name: SfxName, volume: number): boolean
   return true;
 }
 
-export function playSfx(name: SfxName, volume: number): void {
+// `position` (0–1 across the pressed control) picks the note for pitched sounds; omitted → random.
+export function playSfx(name: SfxName, volume: number, position?: number): void {
   if (volume <= 0) return;
   try {
     const audio = getContext();
     if (!audio) return;
     preloadSfx();
-    if (playSample(audio, name, volume)) return;
+    if (playSample(audio, name, volume, position)) return;
     const now = audio.currentTime;
     for (const tone of SFX_RECIPES[name]) {
       const start = now + (tone.delay ?? 0);

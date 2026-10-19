@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../test/render';
 import { AppEffects } from './AppEffects';
@@ -60,4 +60,16 @@ test('music retries on gestures until play() succeeds, then stops listening', as
   const afterSuccess = setMusicVolume.mock.calls.length;
   await userEvent.click(screen.getByRole('button', { name: 'Обычная' }));
   expect(setMusicVolume).toHaveBeenCalledTimes(afterSuccess); // playing → listeners removed
+});
+
+test('game-card click passes its horizontal position; keyboard activation passes none', async () => {
+  ui();
+  const card = screen.getByRole('button', { name: 'Игра' });
+  card.getBoundingClientRect = () => ({ left: 100, width: 200, top: 0, right: 300, bottom: 40, height: 40, x: 100, y: 0, toJSON: () => ({}) });
+  playSfx.mockClear();
+  fireEvent.click(card, { clientX: 100, detail: 1 }); // left edge
+  fireEvent.click(card, { clientX: 250, detail: 1 }); // three quarters across
+  card.focus();
+  await userEvent.keyboard('{Enter}'); // keyboard click: detail 0
+  expect(playSfx.mock.calls.map((c) => [c[0], c[2]])).toEqual([['select', 0], ['select', 0.75], ['select', undefined]]);
 });

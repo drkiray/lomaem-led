@@ -8,7 +8,7 @@ export function useFeedback() {
   const { sfxVolume, vibration } = settings;
   return useMemo(
     () => ({
-      sfx: (name: SfxName) => playSfx(name, sfxVolume),
+      sfx: (name: SfxName, position?: number) => playSfx(name, sfxVolume, position),
       vibrate: (pattern: number | number[]) => vibrate(pattern, vibration),
     }),
     [sfxVolume, vibration],
