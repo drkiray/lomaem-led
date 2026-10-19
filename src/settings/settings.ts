@@ -17,7 +17,12 @@ export interface HatSettings {
   wordsPerPlayer: number;
 }
 
+// Bump when a default changes in a way saved values must not override.
+// v2: music is on by default (v1 saved the old default of 0 for everyone).
+export const SETTINGS_VERSION = 2;
+
 export interface Settings {
+  version: number;
   sfxVolume: number;
   musicVolume: number;
   vibration: boolean;
@@ -33,6 +38,7 @@ export type SettingsPatch = Partial<Omit<Settings, 'spinner' | 'hat'>> & {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
+  version: SETTINGS_VERSION,
   sfxVolume: 0.8,
   musicVolume: 0.3,
   vibration: true,
@@ -60,5 +66,8 @@ export function applyPatch(base: Settings, patch: SettingsPatch): Settings {
 
 export function mergeSettings(stored: unknown): Settings {
   if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return DEFAULT_SETTINGS;
-  return applyPatch(DEFAULT_SETTINGS, stored as SettingsPatch);
+  const patch = stored as SettingsPatch;
+  const merged = applyPatch(DEFAULT_SETTINGS, patch);
+  if ((patch.version ?? 1) < 2) merged.musicVolume = DEFAULT_SETTINGS.musicVolume;
+  return { ...merged, version: SETTINGS_VERSION };
 }

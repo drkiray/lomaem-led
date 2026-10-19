@@ -28,3 +28,9 @@ test('mergeSettings returns defaults for garbage', () => {
   expect(mergeSettings(null)).toEqual(DEFAULT_SETTINGS);
   expect(mergeSettings('abc')).toEqual(DEFAULT_SETTINGS);
 });
+
+test('settings saved before v2 get music turned on once; a later choice of 0 sticks', () => {
+  expect(mergeSettings({ musicVolume: 0, vibration: false }).musicVolume).toBe(0.3);
+  expect(mergeSettings({ musicVolume: 0, vibration: false }).vibration).toBe(false);
+  expect(mergeSettings({ version: 2, musicVolume: 0 }).musicVolume).toBe(0);
+});
