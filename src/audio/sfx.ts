@@ -40,6 +40,7 @@ interface Sample {
   files: string[];
   gain: number;
   jitter?: number; // ± random playback-rate spread, keeps rapid repeats from sounding mechanical
+  pitches?: number[]; // semitone offsets; one is picked per play (never the same twice in a row)
   hits?: number[];
 }
 
@@ -53,9 +54,18 @@ export const SFX_SAMPLES: Record<SfxName, Sample> = {
   countdown: { files: ['countdown'], gain: 0.8 },
   tap: { files: ['tap'], gain: 0.5 },
   toggle: { files: ['toggle'], gain: 0.9 },
-  select: { files: ['select'], gain: 0.6 },
+  // kalimba C note re-pitched along a pentatonic scale: any sequence sounds consonant
+  select: { files: ['select'], gain: 0.6, pitches: [-5, -3, 0, 2, 4, 7, 9, 12] },
   back: { files: ['back'], gain: 0.6 },
 };
+
+// Picks a semitone offset different from the previous one.
+export function pickPitch(pitches: number[], last: number | undefined, rng: () => number = Math.random): number {
+  const options = pitches.length > 1 ? pitches.filter((p) => p !== last) : pitches;
+  return options[Math.floor(rng() * options.length)];
+}
+
+const lastPitch = new Map<SfxName, number>();
 
 const SAMPLE_URL = (file: string) => `${import.meta.env.BASE_URL}sfx/${file}.mp3`;
 
@@ -96,16 +106,22 @@ export function preloadSfx(): void {
 }
 
 function playSample(audio: AudioContext, name: SfxName, volume: number): boolean {
-  const { files, gain, jitter, hits = [0] } = SFX_SAMPLES[name];
+  const { files, gain, jitter, pitches, hits = [0] } = SFX_SAMPLES[name];
   const ready = files.filter((f) => buffers.has(f));
   if (!ready.length) return false;
   const buffer = buffers.get(ready[Math.floor(Math.random() * ready.length)])!;
+  let rate = 1;
+  if (pitches) {
+    const semitones = pickPitch(pitches, lastPitch.get(name));
+    lastPitch.set(name, semitones);
+    rate = 2 ** (semitones / 12);
+  }
   const now = audio.currentTime;
   for (const hit of hits) {
     const src = audio.createBufferSource();
     const g = audio.createGain();
     src.buffer = buffer;
-    if (jitter) src.playbackRate.value = 1 + (Math.random() * 2 - 1) * jitter;
+    src.playbackRate.value = rate * (jitter ? 1 + (Math.random() * 2 - 1) * jitter : 1);
     g.gain.value = Math.min(1, volume * gain);
     src.connect(g);
     g.connect(audio.destination);
@@ -147,5 +163,6 @@ export function playSfx(name: SfxName, volume: number): void {
 export function resetSfxForTests(): void {
   ctx = null;
   buffers.clear();
+  lastPitch.clear();
   loading = false;
 }

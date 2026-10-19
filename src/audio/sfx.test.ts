@@ -1,4 +1,4 @@
-import { SFX_RECIPES, SFX_SAMPLES, playSfx, resetSfxForTests } from './sfx';
+import { SFX_RECIPES, SFX_SAMPLES, pickPitch, playSfx, resetSfxForTests } from './sfx';
 
 function stubAudioContext() {
   const oscillators: unknown[] = [];
@@ -83,4 +83,16 @@ test('a failed sample fetch keeps the synth fallback', async () => {
 
 test('every sfx name has both a synth recipe and a sample entry', () => {
   expect(Object.keys(SFX_SAMPLES).sort()).toEqual(Object.keys(SFX_RECIPES).sort());
+});
+
+test('pickPitch never repeats the previous pitch and stays inside the scale', () => {
+  const scale = SFX_SAMPLES.select.pitches!;
+  let last: number | undefined;
+  for (let i = 0; i < 200; i++) {
+    const p = pickPitch(scale, last);
+    expect(scale).toContain(p);
+    expect(p).not.toBe(last);
+    last = p;
+  }
+  expect(pickPitch([3], 3)).toBe(3); // a one-note scale can't avoid repeating
 });
