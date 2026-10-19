@@ -1,4 +1,4 @@
-import { SFX_RECIPES, playSfx, resetSfxForTests } from './sfx';
+import { SFX_RECIPES, SFX_SAMPLES, playSfx, resetSfxForTests } from './sfx';
 
 function stubAudioContext() {
   const oscillators: unknown[] = [];
@@ -79,4 +79,8 @@ test('a failed sample fetch keeps the synth fallback', async () => {
   await Promise.resolve();
   playSfx('tap', 1);
   expect(oscillators).toHaveLength(2);
+});
+
+test('every sfx name has both a synth recipe and a sample entry', () => {
+  expect(Object.keys(SFX_SAMPLES).sort()).toEqual(Object.keys(SFX_RECIPES).sort());
 });

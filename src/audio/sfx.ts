@@ -1,4 +1,4 @@
-export type SfxName = 'tick' | 'stop' | 'card' | 'correct' | 'skip' | 'timeUp' | 'countdown' | 'tap';
+export type SfxName = 'tick' | 'stop' | 'card' | 'correct' | 'skip' | 'timeUp' | 'countdown' | 'tap' | 'toggle';
 
 interface Tone {
   freq: number;
@@ -28,6 +28,7 @@ export const SFX_RECIPES: Record<SfxName, Tone[]> = {
   ],
   countdown: [{ freq: 600, dur: 0.12, type: 'sine' }],
   tap: [{ freq: 420, dur: 0.05, type: 'sine', gain: 0.5 }],
+  toggle: [{ freq: 520, dur: 0.06, type: 'triangle', gain: 0.5 }],
 };
 
 // Recorded samples (public/sfx, Kenney «Interface Sounds», CC0). Several files
@@ -48,6 +49,7 @@ export const SFX_SAMPLES: Record<SfxName, Sample> = {
   timeUp: { files: ['timeUp'], gain: 1, hits: [0, 0.55] },
   countdown: { files: ['countdown'], gain: 0.8 },
   tap: { files: ['tap'], gain: 0.5 },
+  toggle: { files: ['toggle'], gain: 0.6 },
 };
 
 const SAMPLE_URL = (file: string) => `${import.meta.env.BASE_URL}sfx/${file}.mp3`;

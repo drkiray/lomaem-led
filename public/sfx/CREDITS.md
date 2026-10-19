@@ -13,6 +13,7 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 | correct.mp3 | confirmation_002 |
 | skip.mp3 | back_002 |
 | timeUp.mp3 | error_003 |
+| toggle.mp3 | toggle_002 |
 
 ## Music
 
