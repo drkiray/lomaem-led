@@ -18,6 +18,7 @@ function ui() {
       <button role="switch" aria-checked="false">Тумблер</button>
       <button aria-label="Назад">←</button>
       <button className="game-card">Игра</button>
+      <button className="game-card" aria-disabled="true">Скоро</button>
     </>,
   );
 }
@@ -29,7 +30,8 @@ test('plain buttons tap, game cards select, back/remove buttons back', async () 
   await userEvent.click(screen.getByRole('button', { name: 'Обычная' }));
   await userEvent.click(screen.getByRole('button', { name: 'Игра' }));
   await userEvent.click(screen.getByRole('button', { name: 'Назад' }));
-  expect(playSfx.mock.calls.map((c) => c[0])).toEqual(['tap', 'select', 'back']);
+  await userEvent.click(screen.getByRole('button', { name: 'Скоро' })); // aria-disabled «скоро» card still chimes
+  expect(playSfx.mock.calls.map((c) => c[0])).toEqual(['tap', 'select', 'back', 'select']);
 });
 
 test('disabled, opted-out and switch buttons are silent here', async () => {

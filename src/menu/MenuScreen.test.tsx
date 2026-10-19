@@ -7,8 +7,8 @@ test('shows two playable and two locked games', () => {
   renderWithProviders(<MenuScreen />);
   expect(screen.getByRole('button', { name: /Крутилочка/ })).toBeEnabled();
   expect(screen.getByRole('button', { name: /Шляпа/ })).toBeEnabled();
-  expect(screen.getByRole('button', { name: /Правда или действие/ })).toBeDisabled();
-  expect(screen.getByRole('button', { name: /Нетворкинг/ })).toBeDisabled();
+  expect(screen.getByRole('button', { name: /Правда или действие/ })).toHaveAttribute('aria-disabled', 'true');
+  expect(screen.getByRole('button', { name: /Нетворкинг/ })).toHaveAttribute('aria-disabled', 'true');
   expect(screen.getAllByText('Скоро')).toHaveLength(2);
 });
 
@@ -44,4 +44,11 @@ test('every card puts its emoji or icon in the same fixed slot, so titles line u
     const card = screen.getByRole('button', { name });
     expect(card.firstElementChild).toHaveClass('game-card__slot');
   }
+});
+
+test('locked games stay clickable (for the sound) but go nowhere', async () => {
+  const { navigate } = renderWithProviders(<MenuScreen />);
+  await userEvent.click(screen.getByRole('button', { name: /Правда или действие/ }));
+  await userEvent.click(screen.getByRole('button', { name: /Нетворкинг/ }));
+  expect(navigate).not.toHaveBeenCalled();
 });

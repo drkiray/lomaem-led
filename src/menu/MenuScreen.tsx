@@ -26,7 +26,8 @@ export function MenuScreen() {
                 type="button"
                 className={`game-card ${locked ? 'game-card--locked' : ''}`}
                 style={{ '--accent': game.accent } as CSSProperties}
-                disabled={locked}
+                // aria-disabled, not disabled: a disabled button gets no click, so no sound
+                aria-disabled={locked || undefined}
                 onClick={() => game.route && navigate(game.route)}
               >
                 <span className="game-card__slot" aria-hidden="true">
