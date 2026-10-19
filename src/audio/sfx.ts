@@ -1,4 +1,4 @@
-export type SfxName = 'tick' | 'stop' | 'card' | 'correct' | 'skip' | 'timeUp' | 'countdown' | 'tap' | 'toggle' | 'select' | 'back';
+export type SfxName = 'tick' | 'card' | 'correct' | 'skip' | 'timeUp' | 'countdown' | 'tap' | 'toggle' | 'select' | 'back';
 
 interface Tone {
   freq: number;
@@ -11,10 +11,6 @@ interface Tone {
 
 export const SFX_RECIPES: Record<SfxName, Tone[]> = {
   tick: [{ freq: 1800, dur: 0.025, type: 'square', gain: 0.2 }],
-  stop: [
-    { freq: 660, dur: 0.12, type: 'triangle' },
-    { freq: 990, dur: 0.18, type: 'triangle', delay: 0.1 },
-  ],
   card: [{ freq: 520, dur: 0.25, type: 'sine', slideTo: 880 }],
   correct: [
     { freq: 784, dur: 0.1, type: 'triangle' },
@@ -48,7 +44,6 @@ interface Sample {
 
 export const SFX_SAMPLES: Record<SfxName, Sample> = {
   tick: { files: ['spin-tick'], gain: 0.5, jitter: 0.08 },
-  stop: { files: ['stop'], gain: 0.8 },
   card: { files: ['card'], gain: 0.7 },
   // kalimba arpeggio C–E–G going up: «угадали»
   correct: { files: ['select'], gain: 0.8, hits: [0, 0.09, 0.18], hitPitches: [0, 4, 7] },

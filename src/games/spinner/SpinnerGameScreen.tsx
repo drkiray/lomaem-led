@@ -77,7 +77,6 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
     await spinTo(target, state.config.spinDurationSec * 1000);
     setRotation(normalizeDeg(target));
     saveJSON(KEYS.spinnerSeen, [...seen, next.id]);
-    fx.sfx('stop');
     fx.sfx('card');
     fx.vibrate(60);
     dispatch({ type: 'spinDone' });

@@ -9,7 +9,6 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 | select.mp3 | Freesound 331047 «kalimba-c-note» by foochie_foochie (CC0) |
 | back.mp3 | drop_003 |
 | tap.mp3 | click_003 |
-| stop.mp3 | drop_004 |
 | card.mp3 | Freesound 651514 «paper» by 1bob (CC0) |
 | toggle.mp3 | Freesound 692828 «woodblock-soft» by hollandm (CC0) |
 
