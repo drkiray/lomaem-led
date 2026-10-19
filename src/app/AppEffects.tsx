@@ -10,8 +10,8 @@ function clickSound(el: HTMLElement): SfxName {
   return 'tap';
 }
 
-// Keeps background music in sync with settings; the first tap anywhere
-// retries playback because Chrome blocks audio before a user gesture.
+// Keeps background music in sync with settings; any tap or key press retries
+// playback until it starts, because browsers block audio before a user gesture.
 // Sound-effect samples are decoded up front so the very first tick isn't synth.
 export function AppEffects() {
   const { musicVolume } = useSettings().settings;
@@ -34,10 +34,22 @@ export function AppEffects() {
   }, [fx]);
 
   useEffect(() => {
-    setMusicVolume(musicVolume);
-    const retry = () => setMusicVolume(musicVolume);
-    window.addEventListener('pointerdown', retry, { once: true });
-    return () => window.removeEventListener('pointerdown', retry);
+    let stopped = false;
+    // Browsers only allow audio after a real gesture: `pointerdown` doesn't count
+    // for touch, so listen to the events that do and keep trying until play() sticks.
+    const gestures = ['pointerup', 'touchend', 'click', 'keydown'] as const;
+    const detach = () => gestures.forEach((g) => window.removeEventListener(g, attempt, true));
+    function attempt() {
+      void setMusicVolume(musicVolume).then((playing) => {
+        if (playing && !stopped) detach();
+      });
+    }
+    attempt();
+    if (musicVolume > 0) gestures.forEach((g) => window.addEventListener(g, attempt, true));
+    return () => {
+      stopped = true;
+      detach();
+    };
   }, [musicVolume]);
 
   return null;

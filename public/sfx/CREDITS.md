@@ -6,16 +6,16 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 | File | Original |
 |---|---|
 | spin-tick.mp3 | click_001 |
-| select.mp3 | select_003 |
-| back.mp3 | close_001 |
+| select.mp3 | confirmation_001 |
+| back.mp3 | drop_003 |
 | tap.mp3 | click_003 |
 | stop.mp3 | drop_004 |
-| card.mp3 | open_002 |
+| card.mp3 | question_002 |
 | countdown.mp3 | bong_001 |
 | correct.mp3 | confirmation_002 |
 | skip.mp3 | back_002 |
 | timeUp.mp3 | error_003 |
-| toggle.mp3 | toggle_002 |
+| toggle.mp3 | bong_001 |
 
 ## Music
 

@@ -5,7 +5,8 @@ import { AppEffects } from './AppEffects';
 
 const playSfx = vi.hoisted(() => vi.fn());
 vi.mock('../audio/sfx', () => ({ playSfx, preloadSfx: vi.fn() }));
-vi.mock('../audio/music', () => ({ setMusicVolume: vi.fn() }));
+const setMusicVolume = vi.hoisted(() => vi.fn(() => Promise.resolve(true)));
+vi.mock('../audio/music', () => ({ setMusicVolume }));
 
 function ui() {
   renderWithProviders(
@@ -37,4 +38,24 @@ test('disabled, opted-out and switch buttons are silent here', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Без звука' }));
   await userEvent.click(screen.getByRole('switch', { name: 'Тумблер' }));
   expect(playSfx).not.toHaveBeenCalled();
+});
+
+test('music retries on gestures until play() succeeds, then stops listening', async () => {
+  setMusicVolume.mockReset();
+  let blocked = true;
+  setMusicVolume.mockImplementation(() => Promise.resolve(!blocked));
+  ui();
+  await Promise.resolve();
+  expect(setMusicVolume).toHaveBeenCalledTimes(1); // on mount: blocked
+  await userEvent.click(screen.getByRole('button', { name: 'Обычная' }));
+  const whileBlocked = setMusicVolume.mock.calls.length;
+  expect(whileBlocked).toBeGreaterThan(1); // gesture retried
+  await userEvent.click(screen.getByRole('button', { name: 'Обычная' }));
+  expect(setMusicVolume.mock.calls.length).toBeGreaterThan(whileBlocked); // still blocked → keeps retrying
+  blocked = false;
+  await userEvent.click(screen.getByRole('button', { name: 'Обычная' })); // this one succeeds
+  await Promise.resolve();
+  const afterSuccess = setMusicVolume.mock.calls.length;
+  await userEvent.click(screen.getByRole('button', { name: 'Обычная' }));
+  expect(setMusicVolume).toHaveBeenCalledTimes(afterSuccess); // playing → listeners removed
 });

@@ -2,10 +2,12 @@ const MUSIC_URL = `${import.meta.env.BASE_URL}music/bg.mp3`;
 
 let audio: HTMLAudioElement | null = null;
 
-export function setMusicVolume(volume: number): void {
+// Resolves true once the track is actually playing, false when it is off or the
+// browser blocked it (autoplay policy) — callers retry from a user gesture.
+export function setMusicVolume(volume: number): Promise<boolean> {
   if (volume <= 0) {
     audio?.pause();
-    return;
+    return Promise.resolve(false);
   }
   try {
     if (!audio) {
@@ -13,13 +15,12 @@ export function setMusicVolume(volume: number): void {
       audio.loop = true;
     }
     audio.volume = Math.min(1, volume);
-    if (audio.paused) {
-      const played = audio.play();
-      // Rejected when autoplay is blocked (retried on next tap) or the file is missing.
-      if (played) played.catch(() => {});
-    }
+    if (!audio.paused) return Promise.resolve(true);
+    const played = audio.play();
+    // Rejected when autoplay is blocked or the file is missing.
+    return played ? played.then(() => true, () => false) : Promise.resolve(true);
   } catch {
-    // ignore
+    return Promise.resolve(false);
   }
 }
 
