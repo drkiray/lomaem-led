@@ -19,3 +19,14 @@ used under the Pixabay Content License (https://pixabay.com/service/license-summ
 Re-encoded to 128 kbps mp3 and edited for seamless looping (3 s end-to-start crossfade).
 
 Note: «correct», «skip», «timeUp» and «countdown» have no files of their own — they re-pitch `select.mp3` (kalimba) and `toggle.mp3` (woodblock) at runtime.
+
+### In-game playlist (`public/music/game-1..4.mp3`)
+
+All from Pixabay, Pixabay Content License; converted to mono 96 kbps, loudness-normalised.
+
+| File | Track |
+|---|---|
+| game-1.mp3 | «Chill Gaming Music Relaxing Background» — NeonBumba (527562) |
+| game-2.mp3 | «Peaceful Survival Music Relaxing Music» — NeonBumba (527563) |
+| game-3.mp3 | «A Little Chilled» — Nojisuma (110911) |
+| game-4.mp3 | «Greetings From Beyond» — PhantasticBeats (125084) |

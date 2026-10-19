@@ -29,6 +29,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,mp3}'],
+        // ~9 MB of game tracks: cached on first play instead of on install
+        globIgnores: ['music/game-*.mp3'],
+        runtimeCaching: [
+          { urlPattern: /\/music\/game-\d\.mp3$/, handler: 'CacheFirst', options: { cacheName: 'game-music', expiration: { maxEntries: 8 } } },
+        ],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
     }),

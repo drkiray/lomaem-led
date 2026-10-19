@@ -103,10 +103,14 @@ export function SettingsScreen() {
           <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noreferrer">лицензии Pixabay</a>.
         </p>
         <p>
+          Музыка во время игры (все — Pixabay, та же лицензия): «Chill Gaming Music» и «Peaceful Survival Music» — NeonBumba,
+          «A Little Chilled» — Nojisuma, «Greetings From Beyond» — PhantasticBeats.
+        </p>
+        <p>
           Часть звуков — с <a href="https://freesound.org" target="_blank" rel="noreferrer">Freesound</a>, все под CC0:
           «kalimba-c-note» (foochie_foochie), «paper» (1bob), «woodblock-soft» (hollandm).
         </p>
-        <p>Звуки и музыка сжаты в mp3, звуки обрезаны и выровнены по громкости, музыка смонтирована для бесшовного зацикливания.</p>
+        <p>Звуки и музыка сжаты в mp3, звуки обрезаны и выровнены по громкости, музыка меню смонтирована для бесшовного зацикливания, игровые треки сведены в моно.</p>
       </Modal>
 
       <Modal

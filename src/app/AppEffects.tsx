@@ -1,8 +1,15 @@
 import { useEffect } from 'react';
-import { setMusicVolume } from '../audio/music';
+import { setMusicScene, setMusicVolume, type MusicScene } from '../audio/music';
 import { preloadSfx, type SfxName } from '../audio/sfx';
 import { useFeedback } from '../audio/useFeedback';
 import { useSettings } from '../settings/SettingsContext';
+import { useNav } from './nav';
+import type { RouteName } from './nav';
+
+// Menu, settings and game setup share the menu loop; only a running game gets the playlist.
+export function musicSceneFor(route: RouteName): MusicScene {
+  return route === 'spinner-game' || route === 'hat-game' ? 'game' : 'menu';
+}
 
 function clickSound(el: HTMLElement): SfxName {
   if (el.matches('.game-card')) return 'select';
@@ -16,9 +23,12 @@ function clickSound(el: HTMLElement): SfxName {
 export function AppEffects() {
   const { musicVolume } = useSettings().settings;
 
+  const { route } = useNav();
   const fx = useFeedback();
 
   useEffect(() => preloadSfx(), []);
+
+  useEffect(() => setMusicScene(musicSceneFor(route)), [route]);
 
   // One click sound for every button, so screens don't wire it up one by one.
   // Controls with their own sound opt out via `data-sfx="none"` (or are skipped here).

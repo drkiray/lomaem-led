@@ -1,12 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../test/render';
-import { AppEffects } from './AppEffects';
+import { AppEffects, musicSceneFor } from './AppEffects';
 
 const playSfx = vi.hoisted(() => vi.fn());
 vi.mock('../audio/sfx', () => ({ playSfx, preloadSfx: vi.fn() }));
 const setMusicVolume = vi.hoisted(() => vi.fn(() => Promise.resolve(true)));
-vi.mock('../audio/music', () => ({ setMusicVolume }));
+const setMusicScene = vi.hoisted(() => vi.fn());
+vi.mock('../audio/music', () => ({ setMusicVolume, setMusicScene }));
 
 function ui() {
   renderWithProviders(
@@ -72,4 +73,16 @@ test('game-card click passes its horizontal position; keyboard activation passes
   card.focus();
   await userEvent.keyboard('{Enter}'); // keyboard click: detail 0
   expect(playSfx.mock.calls.map((c) => [c[0], c[2]])).toEqual([['select', 0], ['select', 0.75], ['select', undefined]]);
+});
+
+test('only a running game gets the game playlist; menu, settings and setup keep the menu loop', () => {
+  expect(musicSceneFor('spinner-game')).toBe('game');
+  expect(musicSceneFor('hat-game')).toBe('game');
+  for (const r of ['menu', 'settings', 'spinner-setup', 'hat-setup'] as const) expect(musicSceneFor(r)).toBe('menu');
+});
+
+test('the scene follows the current route', () => {
+  setMusicScene.mockClear();
+  renderWithProviders(<AppEffects />, { route: 'hat-game' });
+  expect(setMusicScene).toHaveBeenLastCalledWith('game');
 });
