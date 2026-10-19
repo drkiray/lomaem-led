@@ -7,7 +7,7 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 |---|---|
 | spin-tick.mp3 | click_001 |
 | select.mp3 | Freesound 331047 «kalimba-c-note» by foochie_foochie (CC0) |
-| back.mp3 | Freesound 767111 «fluffing-and-patting-pillow» by lorraine004 (CC BY-NC 4.0, https://creativecommons.org/licenses/by-nc/4.0/) — one pat, trimmed and normalised |
+| back.mp3 | drop_003 |
 | tap.mp3 | click_003 |
 | stop.mp3 | drop_004 |
 | card.mp3 | Freesound 651514 «paper» by 1bob (CC0) |

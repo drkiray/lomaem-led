@@ -58,7 +58,8 @@ test('sound credits dialog names Kenney and the CC0 license', async () => {
   expect(dialog).toHaveTextContent('Kenney');
   expect(dialog).toHaveTextContent('CC0');
   expect(dialog).toHaveTextContent('FreeGroove');
-  expect(dialog).toHaveTextContent('lorraine004');
+  expect(dialog).toHaveTextContent('foochie_foochie');
+  expect(dialog).not.toHaveTextContent('NC');
   expect(screen.getByRole('link', { name: 'kenney.nl' })).toHaveAttribute('href', 'https://kenney.nl');
   await userEvent.click(screen.getByRole('button', { name: 'Закрыть' }));
   expect(screen.queryByRole('dialog')).toBeNull();
