@@ -45,8 +45,8 @@ interface Sample {
 export const SFX_SAMPLES: Record<SfxName, Sample> = {
   tick: { files: ['spin-tick'], gain: 0.5, jitter: 0.08 },
   card: { files: ['card'], gain: 0.7 },
-  // kalimba arpeggio C–E–G going up: «угадали»
-  correct: { files: ['select'], gain: 0.8, hits: [0, 0.09, 0.18], hitPitches: [0, 4, 7] },
+  // one bright kalimba note (G): «угадали»
+  correct: { files: ['select'], gain: 0.8, hitPitches: [7] },
   // soft low wood knock: «пропуск»
   skip: { files: ['toggle'], gain: 0.9, hitPitches: [-7] },
   // kalimba phrase falling G–E–C–G(low): «время вышло»
