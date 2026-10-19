@@ -102,7 +102,13 @@ export function SettingsScreen() {
           <a href="https://pixabay.com" target="_blank" rel="noreferrer">Pixabay</a>; используется по{' '}
           <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noreferrer">лицензии Pixabay</a>.
         </p>
-        <p>Звуки и музыка сжаты в mp3; музыка слегка смонтирована для бесшовного зацикливания.</p>
+        <p>
+          Часть звуков — с <a href="https://freesound.org" target="_blank" rel="noreferrer">Freesound</a>:
+          «kalimba-c-note» (foochie_foochie), «paper» (1bob), «woodblock-soft» (hollandm) — CC0;
+          «fluffing-and-patting-pillow» (lorraine004) —{' '}
+          <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noreferrer">CC BY-NC 4.0</a>.
+        </p>
+        <p>Звуки и музыка сжаты в mp3, звуки обрезаны и выровнены по громкости, музыка смонтирована для бесшовного зацикливания.</p>
       </Modal>
 
       <Modal

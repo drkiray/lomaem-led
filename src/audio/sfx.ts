@@ -52,7 +52,7 @@ export const SFX_SAMPLES: Record<SfxName, Sample> = {
   timeUp: { files: ['timeUp'], gain: 1, hits: [0, 0.55] },
   countdown: { files: ['countdown'], gain: 0.8 },
   tap: { files: ['tap'], gain: 0.5 },
-  toggle: { files: ['toggle'], gain: 0.6 },
+  toggle: { files: ['toggle'], gain: 0.9 },
   select: { files: ['select'], gain: 0.6 },
   back: { files: ['back'], gain: 0.6 },
 };

@@ -1,50 +1,71 @@
 import { resetMusicForTests, setMusicVolume } from './music';
 
-class FakeAudio {
-  static instances: FakeAudio[] = [];
-  loop = false;
-  volume = 1;
-  paused = true;
-  play = vi.fn(() => {
-    this.paused = false;
-    return Promise.resolve();
-  });
-  pause = vi.fn(() => {
-    this.paused = true;
-  });
-  constructor(public src: string) {
-    FakeAudio.instances.push(this);
-  }
+function stubWebAudio(state: 'running' | 'suspended' = 'running') {
+  const node = { gain: { value: 1 }, connect: vi.fn() };
+  const sources: { loop: boolean; buffer: unknown; start: ReturnType<typeof vi.fn>; connect: ReturnType<typeof vi.fn> }[] = [];
+  const ctx = {
+    state,
+    destination: {},
+    resume: vi.fn(() => {
+      ctx.state = 'running';
+      return Promise.resolve();
+    }),
+    suspend: vi.fn(() => Promise.resolve()),
+    decodeAudioData: vi.fn(() => Promise.resolve({ decoded: true })),
+    createGain: () => node,
+    createBufferSource: () => {
+      const s = { loop: false, buffer: null, start: vi.fn(), connect: vi.fn() };
+      sources.push(s);
+      return s;
+    },
+  };
+  vi.stubGlobal('AudioContext', vi.fn(function () { return ctx; }));
+  const fetchMock = vi.fn((_url: string): Promise<Response> => Promise.resolve({ ok: true, arrayBuffer: () => Promise.resolve(new ArrayBuffer(1)) } as Response));
+  vi.stubGlobal('fetch', fetchMock);
+  return { ctx, node, sources, fetchMock };
 }
 
-beforeEach(() => {
-  FakeAudio.instances = [];
-  vi.stubGlobal('Audio', FakeAudio);
-  resetMusicForTests();
-});
+beforeEach(() => resetMusicForTests());
 afterEach(() => vi.unstubAllGlobals());
 
-test('volume 0 creates nothing', () => {
-  setMusicVolume(0);
-  expect(FakeAudio.instances).toHaveLength(0);
+test('volume 0 creates nothing', async () => {
+  const { sources } = stubWebAudio();
+  expect(await setMusicVolume(0)).toBe(false);
+  expect(sources).toHaveLength(0);
 });
 
-test('positive volume starts looping track from base url', () => {
-  setMusicVolume(0.4);
-  const a = FakeAudio.instances[0];
-  expect(a.src).toMatch(/music\/bg\.mp3$/);
-  expect(a.loop).toBe(true);
-  expect(a.volume).toBe(0.4);
-  expect(a.play).toHaveBeenCalled();
-  setMusicVolume(0);
-  expect(a.pause).toHaveBeenCalled();
+test('positive volume starts one gapless looping source from the base url', async () => {
+  const { sources, node, fetchMock } = stubWebAudio();
+  expect(await setMusicVolume(0.4)).toBe(true);
+  expect(fetchMock.mock.calls[0][0]).toMatch(/music\/bg\.mp3$/);
+  expect(sources).toHaveLength(1);
+  expect(sources[0].loop).toBe(true);
+  expect(sources[0].start).toHaveBeenCalled();
+  expect(node.gain.value).toBe(0.4);
+  expect(await setMusicVolume(0.7)).toBe(true);
+  expect(sources).toHaveLength(1); // volume change reuses the running source
+  expect(node.gain.value).toBe(0.7);
 });
 
-test('rejected play (autoplay block / missing file) is swallowed', async () => {
-  setMusicVolume(0.4);
-  const a = FakeAudio.instances[0];
-  a.paused = true;
-  a.play.mockImplementationOnce(() => Promise.reject(new Error('NotAllowedError')));
-  expect(() => setMusicVolume(0.5)).not.toThrow();
-  await Promise.resolve();
+test('blocked autoplay resolves false and a later gesture starts it', async () => {
+  const { ctx } = stubWebAudio('suspended');
+  ctx.resume.mockImplementationOnce(() => new Promise(() => {})); // pending until a gesture, like Chrome
+  expect(await setMusicVolume(0.4)).toBe(false);
+  expect(await setMusicVolume(0.4)).toBe(true);
+});
+
+test('missing file or missing Web Audio support never throws', async () => {
+  stubWebAudio().fetchMock.mockImplementation(() => Promise.resolve({ ok: false } as Response));
+  await expect(setMusicVolume(0.4)).resolves.toBe(false);
+  vi.stubGlobal('AudioContext', undefined);
+  resetMusicForTests();
+  await expect(setMusicVolume(0.4)).resolves.toBe(false);
+});
+
+test('turning the volume to 0 suspends playback', async () => {
+  const { ctx, node } = stubWebAudio();
+  await setMusicVolume(0.4);
+  await setMusicVolume(0);
+  expect(node.gain.value).toBe(0);
+  expect(ctx.suspend).toHaveBeenCalled();
 });
