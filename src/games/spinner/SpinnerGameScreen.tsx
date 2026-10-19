@@ -74,7 +74,6 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
     const extraTurns = 4 + Math.floor(Math.random() * 2);
     const target = computeStopRotation(state.rotation, turn.answerer, state.players.length, Math.random, extraTurns);
     dispatch({ type: 'spin', rotation: target, cardId: next.id, usedIds });
-    fx.sfx('tap');
     await spinTo(target, state.config.spinDurationSec * 1000);
     setRotation(normalizeDeg(target));
     saveJSON(KEYS.spinnerSeen, [...seen, next.id]);
@@ -98,7 +97,6 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
       kind: card.kind,
     });
     saveJSON(KEYS.spinnerSeen, [...seen, next.id]);
-    fx.sfx('tap');
     dispatch({ type: 'reroll', cardId: next.id, usedIds });
   };
 

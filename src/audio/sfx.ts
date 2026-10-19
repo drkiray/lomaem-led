@@ -1,4 +1,4 @@
-export type SfxName = 'tick' | 'stop' | 'card' | 'correct' | 'skip' | 'timeUp' | 'countdown' | 'tap' | 'toggle';
+export type SfxName = 'tick' | 'stop' | 'card' | 'correct' | 'skip' | 'timeUp' | 'countdown' | 'tap' | 'toggle' | 'select' | 'back';
 
 interface Tone {
   freq: number;
@@ -29,6 +29,8 @@ export const SFX_RECIPES: Record<SfxName, Tone[]> = {
   countdown: [{ freq: 600, dur: 0.12, type: 'sine' }],
   tap: [{ freq: 420, dur: 0.05, type: 'sine', gain: 0.5 }],
   toggle: [{ freq: 520, dur: 0.06, type: 'triangle', gain: 0.5 }],
+  select: [{ freq: 660, dur: 0.12, type: 'sine', slideTo: 880, gain: 0.5 }],
+  back: [{ freq: 440, dur: 0.1, type: 'sine', slideTo: 330, gain: 0.5 }],
 };
 
 // Recorded samples (public/sfx, Kenney «Interface Sounds», CC0). Several files
@@ -37,11 +39,12 @@ export const SFX_RECIPES: Record<SfxName, Tone[]> = {
 interface Sample {
   files: string[];
   gain: number;
+  jitter?: number; // ± random playback-rate spread, keeps rapid repeats from sounding mechanical
   hits?: number[];
 }
 
 export const SFX_SAMPLES: Record<SfxName, Sample> = {
-  tick: { files: ['tick-1', 'tick-2', 'tick-3'], gain: 0.5 },
+  tick: { files: ['spin-tick'], gain: 0.5, jitter: 0.08 },
   stop: { files: ['stop'], gain: 0.8 },
   card: { files: ['card'], gain: 0.7 },
   correct: { files: ['correct'], gain: 0.8 },
@@ -50,6 +53,8 @@ export const SFX_SAMPLES: Record<SfxName, Sample> = {
   countdown: { files: ['countdown'], gain: 0.8 },
   tap: { files: ['tap'], gain: 0.5 },
   toggle: { files: ['toggle'], gain: 0.6 },
+  select: { files: ['select'], gain: 0.6 },
+  back: { files: ['back'], gain: 0.6 },
 };
 
 const SAMPLE_URL = (file: string) => `${import.meta.env.BASE_URL}sfx/${file}.mp3`;
@@ -91,7 +96,7 @@ export function preloadSfx(): void {
 }
 
 function playSample(audio: AudioContext, name: SfxName, volume: number): boolean {
-  const { files, gain, hits = [0] } = SFX_SAMPLES[name];
+  const { files, gain, jitter, hits = [0] } = SFX_SAMPLES[name];
   const ready = files.filter((f) => buffers.has(f));
   if (!ready.length) return false;
   const buffer = buffers.get(ready[Math.floor(Math.random() * ready.length)])!;
@@ -100,6 +105,7 @@ function playSample(audio: AudioContext, name: SfxName, volume: number): boolean
     const src = audio.createBufferSource();
     const g = audio.createGain();
     src.buffer = buffer;
+    if (jitter) src.playbackRate.value = 1 + (Math.random() * 2 - 1) * jitter;
     g.gain.value = Math.min(1, volume * gain);
     src.connect(g);
     g.connect(audio.destination);

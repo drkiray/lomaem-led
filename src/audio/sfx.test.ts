@@ -55,7 +55,7 @@ test('plays the decoded sample instead of the synth, replaying timeUp as two hit
       ...base,
       decodeAudioData: vi.fn(() => Promise.resolve(decoded)),
       createBufferSource: () => {
-        const src = { buffer: null, connect: vi.fn(), start: vi.fn() };
+        const src = { buffer: null, playbackRate: { value: 1 }, connect: vi.fn(), start: vi.fn() };
         sources.push(src);
         return src;
       },

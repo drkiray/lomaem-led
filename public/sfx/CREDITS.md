@@ -5,7 +5,9 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 
 | File | Original |
 |---|---|
-| tick-1/2/3.mp3 | tick_001, tick_002, tick_004 |
+| spin-tick.mp3 | click_001 |
+| select.mp3 | select_003 |
+| back.mp3 | close_001 |
 | tap.mp3 | click_003 |
 | stop.mp3 | drop_004 |
 | card.mp3 | open_002 |

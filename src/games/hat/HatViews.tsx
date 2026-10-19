@@ -103,8 +103,8 @@ export function PlayingView({ state, onGuess, onSkip }: { state: HatState; onGue
       <TimerRing remainingMs={state.remainingMs} totalMs={state.config.turnSeconds * 1000} />
       <div className="word-card" aria-live="polite">{state.hat[0]}</div>
       <div className="hat-play__actions">
-        <Button variant="ghost" onClick={onSkip}>Пропуск</Button>
-        <Button onClick={onGuess}>Угадали ✓</Button>
+        <Button data-sfx="none" variant="ghost" onClick={onSkip}>Пропуск</Button>
+        <Button data-sfx="none" onClick={onGuess}>Угадали ✓</Button>
       </div>
       <p className="muted">Угадано за ход: {guessed}</p>
     </div>
@@ -118,8 +118,8 @@ export function LastWordView({ state, onGuess, onMiss }: { state: HatState; onGu
       <p className="muted">Последняя попытка: {seconds(state.lastWordMs)} сек</p>
       <div className="word-card">{state.hat[0]}</div>
       <div className="hat-play__actions">
-        <Button variant="ghost" onClick={onMiss}>Не успели</Button>
-        <Button onClick={onGuess}>Угадали ✓</Button>
+        <Button data-sfx="none" variant="ghost" onClick={onMiss}>Не успели</Button>
+        <Button data-sfx="none" onClick={onGuess}>Угадали ✓</Button>
       </div>
     </div>
   );
