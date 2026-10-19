@@ -30,7 +30,31 @@ export const SFX_RECIPES: Record<SfxName, Tone[]> = {
   tap: [{ freq: 420, dur: 0.05, type: 'sine', gain: 0.5 }],
 };
 
+// Recorded samples (public/sfx, Kenney «Interface Sounds», CC0). Several files
+// for one name are picked at random; `hits` replays the sample at offsets (s).
+// Until a sample is decoded — or if it fails to load — the synth recipe plays.
+interface Sample {
+  files: string[];
+  gain: number;
+  hits?: number[];
+}
+
+export const SFX_SAMPLES: Record<SfxName, Sample> = {
+  tick: { files: ['tick-1', 'tick-2', 'tick-3'], gain: 0.5 },
+  stop: { files: ['stop'], gain: 0.8 },
+  card: { files: ['card'], gain: 0.7 },
+  correct: { files: ['correct'], gain: 0.8 },
+  skip: { files: ['skip'], gain: 0.7 },
+  timeUp: { files: ['timeUp'], gain: 1, hits: [0, 0.55] },
+  countdown: { files: ['countdown'], gain: 0.8 },
+  tap: { files: ['tap'], gain: 0.5 },
+};
+
+const SAMPLE_URL = (file: string) => `${import.meta.env.BASE_URL}sfx/${file}.mp3`;
+
 let ctx: AudioContext | null = null;
+const buffers = new Map<string, AudioBuffer>();
+let loading = false;
 
 function getContext(): AudioContext | null {
   if (!ctx) {
@@ -43,11 +67,52 @@ function getContext(): AudioContext | null {
   return ctx;
 }
 
+// Fetches and decodes every sample once; safe to call repeatedly.
+export function preloadSfx(): void {
+  if (loading) return;
+  try {
+    const audio = getContext();
+    if (!audio?.decodeAudioData || typeof fetch !== 'function') return;
+    loading = true;
+    for (const { files } of Object.values(SFX_SAMPLES)) {
+      for (const file of files) {
+        fetch(SAMPLE_URL(file))
+          .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+          .then((data) => audio.decodeAudioData(data))
+          .then((buf) => void buffers.set(file, buf))
+          .catch(() => {}); // missing file → synth fallback
+      }
+    }
+  } catch {
+    loading = false;
+  }
+}
+
+function playSample(audio: AudioContext, name: SfxName, volume: number): boolean {
+  const { files, gain, hits = [0] } = SFX_SAMPLES[name];
+  const ready = files.filter((f) => buffers.has(f));
+  if (!ready.length) return false;
+  const buffer = buffers.get(ready[Math.floor(Math.random() * ready.length)])!;
+  const now = audio.currentTime;
+  for (const hit of hits) {
+    const src = audio.createBufferSource();
+    const g = audio.createGain();
+    src.buffer = buffer;
+    g.gain.value = Math.min(1, volume * gain);
+    src.connect(g);
+    g.connect(audio.destination);
+    src.start(now + hit);
+  }
+  return true;
+}
+
 export function playSfx(name: SfxName, volume: number): void {
   if (volume <= 0) return;
   try {
     const audio = getContext();
     if (!audio) return;
+    preloadSfx();
+    if (playSample(audio, name, volume)) return;
     const now = audio.currentTime;
     for (const tone of SFX_RECIPES[name]) {
       const start = now + (tone.delay ?? 0);
@@ -73,4 +138,6 @@ export function playSfx(name: SfxName, volume: number): void {
 
 export function resetSfxForTests(): void {
   ctx = null;
+  buffers.clear();
+  loading = false;
 }

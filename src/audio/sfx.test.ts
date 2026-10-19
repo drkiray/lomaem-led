@@ -43,3 +43,40 @@ test('plays one oscillator per tone in recipe', () => {
   playSfx('timeUp', 0.5);
   expect(oscillators).toHaveLength(SFX_RECIPES.timeUp.length);
 });
+
+test('plays the decoded sample instead of the synth, replaying timeUp as two hits', async () => {
+  const { oscillators } = stubAudioContext();
+  const sources: { start: ReturnType<typeof vi.fn> }[] = [];
+  const decoded = {} as AudioBuffer;
+  const ctor = (window as unknown as { AudioContext: ReturnType<typeof vi.fn> }).AudioContext;
+  const base = ctor();
+  ctor.mockImplementation(function () {
+    return {
+      ...base,
+      decodeAudioData: vi.fn(() => Promise.resolve(decoded)),
+      createBufferSource: () => {
+        const src = { buffer: null, connect: vi.fn(), start: vi.fn() };
+        sources.push(src);
+        return src;
+      },
+    };
+  });
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, arrayBuffer: () => Promise.resolve(new ArrayBuffer(1)) })));
+  playSfx('timeUp', 1); // first call kicks off loading, synth plays meanwhile
+  expect(oscillators.length).toBeGreaterThan(0);
+  await vi.waitFor(() => {
+    oscillators.length = 0;
+    playSfx('timeUp', 1);
+    expect(sources).toHaveLength(2);
+  });
+  expect(oscillators).toHaveLength(0);
+});
+
+test('a failed sample fetch keeps the synth fallback', async () => {
+  const { oscillators } = stubAudioContext();
+  vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('offline'))));
+  playSfx('tap', 1);
+  await Promise.resolve();
+  playSfx('tap', 1);
+  expect(oscillators).toHaveLength(2);
+});

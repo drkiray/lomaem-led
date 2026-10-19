@@ -34,7 +34,7 @@ export type SettingsPatch = Partial<Omit<Settings, 'spinner' | 'hat'>> & {
 
 export const DEFAULT_SETTINGS: Settings = {
   sfxVolume: 0.8,
-  musicVolume: 0,
+  musicVolume: 0.3,
   vibration: true,
   keepAwake: true,
   landscapeGames: true,

@@ -2,7 +2,7 @@ import { DEFAULT_SETTINGS, applyPatch, mergeSettings } from './settings';
 
 test('defaults match spec', () => {
   expect(DEFAULT_SETTINGS.sfxVolume).toBe(0.8);
-  expect(DEFAULT_SETTINGS.musicVolume).toBe(0);
+  expect(DEFAULT_SETTINGS.musicVolume).toBe(0.3);
   expect(DEFAULT_SETTINGS.vibration).toBe(true);
   expect(DEFAULT_SETTINGS.keepAwake).toBe(true);
   expect(DEFAULT_SETTINGS.spinner.actionRatio).toBe(0.3);

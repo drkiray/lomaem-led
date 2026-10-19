@@ -42,6 +42,7 @@ export function SettingsScreen() {
   const { settings, update, reset } = useSettings();
   const [confirmReset, setConfirmReset] = useState(false);
   const [historyCleared, setHistoryCleared] = useState(false);
+  const [showCredits, setShowCredits] = useState(false);
 
   return (
     <Screen title="Настройки" onBack={back}>
@@ -84,6 +85,25 @@ export function SettingsScreen() {
       </Section>
 
       <Button variant="danger" onClick={() => setConfirmReset(true)}>Сбросить все настройки</Button>
+      <Button variant="ghost" onClick={() => setShowCredits(true)}>Авторы звукового сопровождения</Button>
+
+      <Modal
+        open={showCredits}
+        title="Авторы звукового сопровождения"
+        actions={<Button onClick={() => setShowCredits(false)}>Закрыть</Button>}
+      >
+        <p>
+          Звуковые эффекты — «Interface Sounds» от Kenney (<a href="https://kenney.nl" target="_blank" rel="noreferrer">kenney.nl</a>),
+          лицензия CC0 1.0 Universal (общественное достояние):{' '}
+          <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noreferrer">creativecommons.org/publicdomain/zero/1.0</a>.
+        </p>
+        <p>
+          Фоновая музыка — «Exotic Beauty», автор FreeGroove, с{' '}
+          <a href="https://pixabay.com" target="_blank" rel="noreferrer">Pixabay</a>; используется по{' '}
+          <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noreferrer">лицензии Pixabay</a>.
+        </p>
+        <p>Звуки и музыка сжаты в mp3, остальные изменения не вносились.</p>
+      </Modal>
 
       <Modal
         open={confirmReset}

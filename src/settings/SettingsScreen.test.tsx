@@ -50,3 +50,15 @@ test('back arrow calls nav.back', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Назад' }));
   expect(back).toHaveBeenCalled();
 });
+
+test('sound credits dialog names Kenney and the CC0 license', async () => {
+  renderWithProviders(<SettingsScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Авторы звукового сопровождения' }));
+  const dialog = screen.getByRole('dialog', { name: 'Авторы звукового сопровождения' });
+  expect(dialog).toHaveTextContent('Kenney');
+  expect(dialog).toHaveTextContent('CC0');
+  expect(dialog).toHaveTextContent('FreeGroove');
+  expect(screen.getByRole('link', { name: 'kenney.nl' })).toHaveAttribute('href', 'https://kenney.nl');
+  await userEvent.click(screen.getByRole('button', { name: 'Закрыть' }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
