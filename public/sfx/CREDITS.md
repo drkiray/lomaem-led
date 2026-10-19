@@ -18,4 +18,4 @@ released under CC0 1.0 (public domain). Attribution is not required but apprecia
 
 `public/music/bg.mp3` — «Exotic Beauty» by FreeGroove, from Pixabay (https://pixabay.com),
 used under the Pixabay Content License (https://pixabay.com/service/license-summary/).
-Re-encoded to 128 kbps mp3; otherwise unmodified.
+Re-encoded to 128 kbps mp3 and edited for seamless looping (3 s end-to-start crossfade).

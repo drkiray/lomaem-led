@@ -102,7 +102,7 @@ export function SettingsScreen() {
           <a href="https://pixabay.com" target="_blank" rel="noreferrer">Pixabay</a>; используется по{' '}
           <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noreferrer">лицензии Pixabay</a>.
         </p>
-        <p>Звуки и музыка сжаты в mp3, остальные изменения не вносились.</p>
+        <p>Звуки и музыка сжаты в mp3; музыка слегка смонтирована для бесшовного зацикливания.</p>
       </Modal>
 
       <Modal
