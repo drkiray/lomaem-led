@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { SettingsProvider } from '../settings/SettingsContext';
 import { ScreenTransition } from '../ui/ScreenTransition';
 import { AppEffects } from './AppEffects';
 import { NavProvider, useNav } from './nav';
 import { SCREENS, showsCrack } from './screens';
+import { Splash } from './Splash';
 
 function Router() {
   const { route } = useNav();
@@ -17,11 +19,12 @@ function Router() {
 }
 
 export function App() {
+  const [started, setStarted] = useState(false);
   return (
     <SettingsProvider>
       <NavProvider>
         <AppEffects />
-        <Router />
+        {started ? <Router /> : <Splash onStart={() => setStarted(true)} />}
       </NavProvider>
     </SettingsProvider>
   );

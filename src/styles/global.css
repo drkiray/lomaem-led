@@ -159,6 +159,25 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .modal__actions { display: flex; gap: 10px; }
 .modal__actions > * { flex: 1; }
 
+/* Splash: logo, a quick fake loading bar, then the «Поиграем?» button */
+.splash {
+  min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px;
+  padding: max(16px, env(safe-area-inset-top)) 24px max(16px, env(safe-area-inset-bottom));
+}
+.splash .logo { font-size: 48px; margin: 0; animation: fade-in 0.5s ease both; }
+.splash__stage { width: min(280px, 100%); height: 62px; display: grid; place-items: center; }
+.splash__bar {
+  width: 100%; height: 8px; border-radius: 999px; overflow: hidden;
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+.splash__fill {
+  height: 100%; width: 100%; border-radius: inherit; transform-origin: left; transform: scaleX(0);
+  background: linear-gradient(90deg, var(--ice-2), var(--ice)); box-shadow: var(--ice-glow);
+  animation: splash-load 1.3s cubic-bezier(0.45, 0.05, 0.3, 1) forwards;
+}
+.splash__go { animation: pop-in 0.35s ease both; }
+@keyframes splash-load { to { transform: scaleX(1); } }
+
 /* Menu */
 /* Fills the screen so the credit line sits at the very bottom. */
 .menu { display: flex; flex-direction: column; gap: 20px; min-height: calc(100dvh - var(--pad-top) - var(--pad-bottom)); }
@@ -241,5 +260,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
   .ice-crack { display: none; }
+  .splash__fill { animation: none; transform: none; }
+  .splash .logo, .splash__go { animation: none; }
   .screen-enter, .modal, .modal-backdrop, .wheel__hub, .wheel__hub::after, .wheel__hub-icon { animation: none !important; }
 }
