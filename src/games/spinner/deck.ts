@@ -9,6 +9,8 @@ export interface Card {
   level: Level;
   kind: CardKind;
   text: string;
+  /** a question about the birthday person */
+  birthday?: true;
 }
 
 interface PickOptions {
@@ -45,6 +47,32 @@ export function pickCard(cards: Card[], { level, usedIds, seenIds, actionRatio, 
   return { card, usedIds: [...used, card.id] };
 }
 
-export function fillTemplate(text: string, asker: string, answerer: string): string {
-  return text.replaceAll('{asker}', asker).replaceAll('{answerer}', answerer);
+export function fillTemplate(text: string, asker: string, answerer: string, birthday = ''): string {
+  return text.replaceAll('{asker}', asker).replaceAll('{answerer}', answerer).replaceAll('{birthday}', birthday);
+}
+
+// Birthday mode: every 2nd or 3rd card (re-rolled after each one) is about the
+// birthday person. `since` counts ordinary cards since the last birthday card.
+export interface BirthdayPlan {
+  index: number; // player index of the birthday person
+  since: number;
+  every: 2 | 3;
+}
+
+export function createBirthdayPlan(index: number, rng: Rng): BirthdayPlan {
+  return { index, since: 0, every: rng() < 0.5 ? 2 : 3 };
+}
+
+// The birthday person can't be asked about themself, so such turns are skipped
+// (the counter keeps waiting for the next fitting turn).
+export function planBirthdayCard(
+  plan: BirthdayPlan,
+  turn: { asker: number; answerer: number },
+  rng: Rng,
+): { useBirthday: boolean; plan: BirthdayPlan } {
+  const fits = turn.asker !== plan.index && turn.answerer !== plan.index;
+  if (fits && plan.since >= plan.every - 1) {
+    return { useBirthday: true, plan: { ...plan, since: 0, every: rng() < 0.5 ? 2 : 3 } };
+  }
+  return { useBirthday: false, plan: { ...plan, since: plan.since + 1 } };
 }

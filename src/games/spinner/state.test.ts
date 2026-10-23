@@ -64,3 +64,15 @@ test('reroll swaps the shown card only while it is shown', () => {
   const ready = { ...shown, phase: 'ready' as const };
   expect(spinnerReducer(ready, { type: 'reroll', cardId: 'q2', usedIds: [] })).toBe(ready);
 });
+
+test('birthday plan is kept by spin and restored; bad or missing plan becomes null', () => {
+  const plan = { index: 0, since: 1, every: 2 as const };
+  const g = createSpinnerGame(['Аня', 'Боря', 'Вика'], config, turns, plan);
+  const spun = spinnerReducer(g, { type: 'spin', rotation: 10, cardId: 'b1-q1', usedIds: ['b1-q1'], birthday: { ...plan, since: 0 } });
+  expect(spun.birthday).toEqual({ ...plan, since: 0 });
+  expect(restoreSpinnerGame(JSON.parse(JSON.stringify(g)))?.birthday).toEqual(plan);
+  const old = JSON.parse(JSON.stringify(g));
+  delete old.birthday;
+  expect(restoreSpinnerGame(old)?.birthday).toBeNull();
+  expect(restoreSpinnerGame({ ...g, birthday: { index: 9, since: 0, every: 2 } })?.birthday).toBeNull();
+});

@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useNav } from '../../app/nav';
 import { useFeedback } from '../../audio/useFeedback';
+import { BIRTHDAY_CARDS } from '../../content/birthdayCards';
 import { SPINNER_CARDS } from '../../content/spinnerCards';
 import { KEYS, loadJSON, removeKey, saveJSON } from '../../lib/storage';
 import { useLandscape } from '../../lib/useLandscape';
@@ -10,7 +11,7 @@ import { Button } from '../../ui/Button';
 import { FullscreenButton, LandscapePrompt } from '../../ui/LandscapePrompt';
 import { Modal } from '../../ui/Modal';
 import { Screen } from '../../ui/Screen';
-import { LEVELS, fillTemplate, pickCard, type Level } from './deck';
+import { LEVELS, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
 import { computeStopRotation, normalizeDeg } from './geometry';
 import { currentTurn, restoreSpinnerGame, spinnerReducer, type SpinnerState } from './state';
 import { buildRoundTurns } from './turns';
@@ -18,6 +19,7 @@ import { useSpin } from './useSpin';
 import { Wheel } from './Wheel';
 import './spinner.css';
 
+const ALL_CARDS = [...SPINNER_CARDS, ...BIRTHDAY_CARDS];
 const LEVEL_TITLES: Record<Level, string> = { 1: 'Поверхность', 2: 'Погружение', 3: 'Глубина' };
 
 export function SpinnerGameScreen() {
@@ -58,13 +60,16 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   const turn = currentTurn(state);
   const asker = state.players[turn.asker];
   const answerer = state.players[turn.answerer];
-  const card = state.cardId ? SPINNER_CARDS.find((c) => c.id === state.cardId) ?? null : null;
+  const card = state.cardId ? ALL_CARDS.find((c) => c.id === state.cardId) ?? null : null;
+  const birthdayName = state.birthday ? state.players[state.birthday.index] : '';
+  const isBirthdayCard = card?.birthday === true;
 
   const spin = async () => {
     if (state.phase !== 'ready' || busy.current) return;
     busy.current = true;
     const seen = loadJSON<string[]>(KEYS.spinnerSeen, []);
-    const { card: next, usedIds } = pickCard(SPINNER_CARDS, {
+    const plan = state.birthday ? planBirthdayCard(state.birthday, turn, Math.random) : null;
+    const { card: next, usedIds } = pickCard(plan?.useBirthday ? BIRTHDAY_CARDS : SPINNER_CARDS, {
       level: state.level,
       usedIds: state.usedIds,
       seenIds: new Set(seen),
@@ -73,7 +78,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
     });
     const extraTurns = 4 + Math.floor(Math.random() * 2);
     const target = computeStopRotation(state.rotation, turn.answerer, state.players.length, Math.random, extraTurns);
-    dispatch({ type: 'spin', rotation: target, cardId: next.id, usedIds });
+    dispatch({ type: 'spin', rotation: target, cardId: next.id, usedIds, birthday: plan?.plan });
     await spinTo(target, state.config.spinDurationSec * 1000);
     setRotation(normalizeDeg(target));
     saveJSON(KEYS.spinnerSeen, [...seen, next.id]);
@@ -87,7 +92,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   const reroll = () => {
     if (state.phase !== 'card' || !card) return;
     const seen = loadJSON<string[]>(KEYS.spinnerSeen, []);
-    const { card: next, usedIds } = pickCard(SPINNER_CARDS, {
+    const { card: next, usedIds } = pickCard(card.birthday ? BIRTHDAY_CARDS : SPINNER_CARDS, {
       level: state.level,
       usedIds: state.usedIds,
       seenIds: new Set(seen),
@@ -149,11 +154,13 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
 
       <Modal
         open={state.phase === 'card' && card !== null}
-        title={card?.kind === 'action' ? 'Действие' : 'Вопрос'}
+        title={isBirthdayCard ? 'Вопрос про именинника' : card?.kind === 'action' ? 'Действие' : 'Вопрос'}
+        festive={isBirthdayCard}
         actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone' })}>Готово</Button>}
       >
+        {isBirthdayCard && <div className="spin-card__gift" aria-hidden="true">🎁</div>}
         <p className="spin-card__names"><b>{asker}</b> → <b>{answerer}</b></p>
-        <p className="spin-card__text" key={card?.id}>{card ? fillTemplate(card.text, asker, answerer) : ''}</p>
+        <p className="spin-card__text" key={card?.id}>{card ? fillTemplate(card.text, asker, answerer, birthdayName) : ''}</p>
         <button type="button" className="spin-card__reroll" onClick={reroll}>
           <span className="spin-card__reroll-icon" aria-hidden="true">↻</span>
           {card?.kind === 'action' ? 'не хочу делать' : 'не хочу отвечать'}

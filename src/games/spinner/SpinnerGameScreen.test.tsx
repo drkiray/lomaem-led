@@ -119,3 +119,27 @@ test('«не хочу отвечать» replaces the question with another ques
   expect(game.usedIds).toEqual(['l1-q1', game.cardId]);
   expect(game.turnIndex).toBe(0);
 });
+
+test('birthday card is festive, names the birthday person and keeps its kind on reroll', async () => {
+  localStorage.setItem(
+    'll.spinner.game',
+    JSON.stringify({
+      ...createSpinnerGame(['Денис', 'Аня', 'Петя'], { spinDurationSec: 4, actionRatio: 0.3 }, [
+        { asker: 1, answerer: 2 },
+        { asker: 2, answerer: 1 },
+        { asker: 0, answerer: 1 },
+      ], { index: 0, since: 0, every: 2 }),
+      phase: 'card',
+      cardId: 'b1-q1',
+      usedIds: ['b1-q1'],
+    }),
+  );
+  renderWithProviders(<SpinnerGameScreen />);
+  const dialog = screen.getByRole('dialog', { name: 'Вопрос про именинника' });
+  expect(dialog).toHaveClass('modal--festive');
+  expect(dialog).toHaveTextContent('🎁');
+  expect(dialog).toHaveTextContent('Аня → Петя');
+  expect(dialog).toHaveTextContent('— Денис');
+  await userEvent.click(screen.getByRole('button', { name: /не хочу отвечать/ }));
+  expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).cardId).toMatch(/^b1-q/);
+});

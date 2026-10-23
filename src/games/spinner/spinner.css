@@ -85,3 +85,27 @@
   .spinner-game > .wheel { grid-area: wheel; width: min(calc(var(--fit) - 28px), 55vw); margin-left: 14px; }
   .spinner-game__hint { grid-area: hint; margin: 0; }
 }
+
+/* Birthday mode: highlighted name field in setup, festive card in the game */
+.players__row--birthday { margin-bottom: 4px; }
+.players__row--birthday .players__num { font-size: 20px; }
+.input--birthday {
+  border-color: #ffc86b; background: linear-gradient(135deg, rgba(255, 200, 107, 0.16), rgba(255, 120, 170, 0.12));
+  box-shadow: 0 0 14px rgba(255, 200, 107, 0.3);
+}
+.input--birthday:focus { border-color: #ffd98f; box-shadow: 0 0 18px rgba(255, 200, 107, 0.5); }
+.modal--festive {
+  border-color: #ffc86b;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 200, 107, 0.28) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 12%, rgba(255, 120, 170, 0.32) 0 4px, transparent 5px),
+    radial-gradient(circle at 78% 82%, rgba(127, 231, 255, 0.3) 0 3px, transparent 4px),
+    radial-gradient(circle at 20% 88%, rgba(255, 120, 170, 0.28) 0 3px, transparent 4px),
+    linear-gradient(160deg, #3a2347 0%, #1d1530 100%);
+  box-shadow: 0 0 44px rgba(255, 200, 107, 0.35);
+}
+.modal--festive .modal__title { color: #ffd98f; text-align: center; }
+.modal--festive .spin-card__names b { color: #ffd98f; }
+.spin-card__gift { font-size: 52px; line-height: 1; text-align: center; animation: gift-bounce 1.6s ease-in-out infinite; }
+@keyframes gift-bounce { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { .spin-card__gift { animation: none; } }

@@ -1,5 +1,5 @@
 import { mulberry32 } from '../../lib/random';
-import { fillTemplate, pickCard, type Card } from './deck';
+import { createBirthdayPlan, fillTemplate, pickCard, planBirthdayCard, type Card } from './deck';
 
 const CARDS: Card[] = [
   { id: 'q1', level: 1, kind: 'question', text: 'Q1?' },
@@ -64,4 +64,27 @@ test('forced kind: a replacement card keeps the kind of the one it replaces', ()
     expect(card.id).toBe('q2');
     expect(usedIds).toEqual(['q1', 'q2']);
   }
+});
+
+test('birthday plan: a birthday card every 2nd or 3rd fitting turn, never about themself', () => {
+  const turn = { asker: 1, answerer: 2 };
+  let plan = createBirthdayPlan(0, () => 0.9); // every 3
+  expect(plan.every).toBe(3);
+  const flags: boolean[] = [];
+  for (let i = 0; i < 6; i++) {
+    const r = planBirthdayCard(plan, turn, () => 0.9);
+    flags.push(r.useBirthday);
+    plan = r.plan;
+  }
+  expect(flags).toEqual([false, false, true, false, false, true]);
+  const two = planBirthdayCard({ index: 0, since: 1, every: 2 }, turn, () => 0.9);
+  expect(two.useBirthday).toBe(true);
+  expect(two.plan).toEqual({ index: 0, since: 0, every: 3 }); // re-rolled
+  const mine = planBirthdayCard({ index: 0, since: 5, every: 2 }, { asker: 0, answerer: 2 }, () => 0);
+  expect(mine.useBirthday).toBe(false); // birthday person asks: wait for another turn
+  expect(planBirthdayCard({ index: 0, since: 5, every: 2 }, { asker: 1, answerer: 0 }, () => 0).useBirthday).toBe(false);
+});
+
+test('fillTemplate fills {birthday}', () => {
+  expect(fillTemplate('{asker}, про {birthday}', 'А', 'Б', 'Д')).toBe('А, про Д');
 });
