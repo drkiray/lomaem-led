@@ -139,7 +139,7 @@ test('birthday card is festive, names the birthday person and keeps its kind on 
   expect(dialog).toHaveClass('modal--festive');
   expect(dialog).toHaveTextContent('🎁');
   expect(dialog).toHaveTextContent('Аня → Петя');
-  expect(dialog).toHaveTextContent('— Денис');
+  expect(dialog).toHaveTextContent('Денис');
   await userEvent.click(screen.getByRole('button', { name: /не хочу отвечать/ }));
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).cardId).toMatch(/^b1-q/);
 });

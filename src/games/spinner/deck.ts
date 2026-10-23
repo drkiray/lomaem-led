@@ -1,3 +1,4 @@
+import { declineName, type NameCase } from '../../lib/declension';
 import type { Rng } from '../../lib/random';
 
 export type Level = 1 | 2 | 3;
@@ -48,7 +49,7 @@ export function pickCard(cards: Card[], { level, usedIds, seenIds, actionRatio, 
 }
 
 export function fillTemplate(text: string, asker: string, answerer: string, birthday = ''): string {
-  return text.replaceAll('{asker}', asker).replaceAll('{answerer}', answerer).replaceAll('{birthday}', birthday);
+  return text.replaceAll('{asker}', asker).replaceAll('{answerer}', answerer).replace(/\{birthday(?::(gen|dat|acc|ins|prep))?\}/g, (_, c?: NameCase) => (c ? declineName(birthday, c) : birthday));
 }
 
 // Birthday mode: every 2nd or 3rd card (re-rolled after each one) is about the

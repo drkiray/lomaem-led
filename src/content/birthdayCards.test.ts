@@ -11,11 +11,19 @@ test('all are questions that mention the birthday person and fill cleanly', () =
   for (const c of BIRTHDAY_CARDS) {
     expect(c.kind).toBe('question');
     expect(c.birthday).toBe(true);
-    expect(c.text).toContain('{birthday}');
+    expect(c.text).toMatch(/\{birthday/);
     expect(fillTemplate(c.text, 'А', 'Б', 'Д')).not.toMatch(/[{}]/);
   }
 });
 
-test('the name always follows a dash (never declined)', () => {
-  for (const c of BIRTHDAY_CARDS) expect(c.text).toMatch(/— \{birthday\}/);
+test('only known placeholder cases, and no «именинник» wording', () => {
+  for (const c of BIRTHDAY_CARDS) {
+    expect(c.text.replace(/\{birthday(:(gen|dat|acc|ins|prep))?\}/g, '')).not.toMatch(/[{}]/);
+    expect(c.text).not.toMatch(/именинник/i);
+  }
+});
+
+test('names are declined inside the text', () => {
+  const c = BIRTHDAY_CARDS.find((x) => x.text.includes('{birthday:ins}'))!;
+  expect(fillTemplate(c.text, 'А', 'Б', 'Денис')).toContain('Денисом');
 });

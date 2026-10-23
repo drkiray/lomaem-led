@@ -25,3 +25,13 @@ export function loadLastPlayers(): string[] {
 export function rememberPlayers(names: string[]): void {
   saveJSON(KEYS.lastPlayers, names);
 }
+
+// Spinner birthday mode: the birthday person of the last game ('' when it was off).
+export function loadLastBirthday(): string {
+  const value = loadJSON<unknown>(KEYS.lastBirthday, '');
+  return typeof value === 'string' ? value : '';
+}
+
+export function rememberBirthday(name: string): void {
+  saveJSON(KEYS.lastBirthday, name);
+}

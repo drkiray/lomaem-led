@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNav } from '../../app/nav';
 import { KEYS, saveJSON } from '../../lib/storage';
 import { PlayerListInput } from '../../players/PlayerListInput';
-import { cleanPlayers, rememberPlayers, validatePlayers } from '../../players/players';
+import { cleanPlayers, loadLastBirthday, rememberBirthday, rememberPlayers, validatePlayers } from '../../players/players';
 import { useSettings } from '../../settings/SettingsContext';
 import { DEFAULT_SETTINGS } from '../../settings/settings';
 import { Button } from '../../ui/Button';
@@ -23,6 +23,7 @@ export function SpinnerSetupScreen() {
   const [spinDurationSec, setSpinDurationSec] = useState(settings.spinner.spinDurationSec);
   const [birthday, setBirthday] = useState(false);
   const [birthdayName, setBirthdayName] = useState('');
+  const [lastBirthday] = useState(loadLastBirthday);
   const [submitted, setSubmitted] = useState(false);
 
   // the birthday person plays too: always the first player on the wheel
@@ -35,6 +36,7 @@ export function SpinnerSetupScreen() {
     setSubmitted(true);
     if (error) return;
     rememberPlayers(cleanPlayers(players));
+    rememberBirthday(birthday ? birthdayClean : '');
     const names = cleanPlayers(everyone);
     const game = createSpinnerGame(
       names,
@@ -64,7 +66,16 @@ export function SpinnerSetupScreen() {
           />
         </div>
       )}
-      <PlayerListInput players={players} onChange={setPlayers} />
+      <PlayerListInput
+        players={players}
+        onChange={setPlayers}
+        extra={birthday && birthdayClean ? 1 : 0}
+        lastExtra={lastBirthday ? 1 : 0}
+        onRestoreLast={() => {
+          setBirthday(lastBirthday !== '');
+          setBirthdayName(lastBirthday);
+        }}
+      />
       {count > SOFT_MAX_PLAYERS && (
         <p className="muted">Больше 30 игроков — имена на круге будут совсем мелкими.</p>
       )}

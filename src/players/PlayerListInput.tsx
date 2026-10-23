@@ -5,9 +5,14 @@ import { cleanPlayers, loadLastPlayers } from './players';
 interface Props {
   players: string[];
   onChange: (players: string[]) => void;
+  /** players kept outside the list (the birthday person): counted in the totals */
+  extra?: number;
+  /** extras restored by «Как в прошлый раз» */
+  lastExtra?: number;
+  onRestoreLast?: () => void;
 }
 
-export function PlayerListInput({ players, onChange }: Props) {
+export function PlayerListInput({ players, onChange, extra = 0, lastExtra = 0, onRestoreLast }: Props) {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const last = useMemo(loadLastPlayers, []);
@@ -28,8 +33,11 @@ export function PlayerListInput({ players, onChange }: Props) {
   return (
     <div className="players">
       {last.length > 0 && (
-        <Button variant="ghost" onClick={() => onChange([...last])}>
-          Как в прошлый раз ({last.length})
+        <Button variant="ghost" onClick={() => {
+          onChange([...last]);
+          onRestoreLast?.();
+        }}>
+          Как в прошлый раз ({last.length + lastExtra})
         </Button>
       )}
       <ol className="players__list">
@@ -67,7 +75,7 @@ export function PlayerListInput({ players, onChange }: Props) {
         ))}
       </ol>
       <Button variant="ghost" onClick={add}>+ Добавить игрока</Button>
-      <p className="muted">Игроков: {cleanPlayers(players).length}</p>
+      <p className="muted">Игроков: {cleanPlayers(players).length + extra}</p>
     </div>
   );
 }

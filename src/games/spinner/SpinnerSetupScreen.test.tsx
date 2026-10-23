@@ -53,3 +53,22 @@ test('without the toggle there is no birthday plan', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Начать' }));
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).birthday).toBeNull();
 });
+
+test('«Как в прошлый раз» restores the birthday person and counts them', async () => {
+  localStorage.setItem('ll.lastPlayers', JSON.stringify(['Маша', 'Петя']));
+  localStorage.setItem('ll.lastBirthday', JSON.stringify('Денис'));
+  renderWithProviders(<SpinnerSetupScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Как в прошлый раз (3)' }));
+  expect(screen.getByLabelText('Имя именинника')).toHaveValue('Денис');
+  expect(screen.getByLabelText('Имя игрока 1')).toHaveValue('Маша');
+  expect(screen.getByText('Игроков: 3')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Начать' }));
+  expect(JSON.parse(localStorage.getItem('ll.lastBirthday')!)).toBe('Денис');
+});
+
+test('«Как в прошлый раз» without a past birthday person keeps the mode off', async () => {
+  localStorage.setItem('ll.lastPlayers', JSON.stringify(['Маша', 'Петя']));
+  renderWithProviders(<SpinnerSetupScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Как в прошлый раз (2)' }));
+  expect(screen.queryByLabelText('Имя именинника')).toBeNull();
+});

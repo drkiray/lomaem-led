@@ -3,6 +3,7 @@ const PREFIX = 'll.';
 export const KEYS = {
   settings: 'settings',
   lastPlayers: 'lastPlayers',
+  lastBirthday: 'lastBirthday',
   spinnerGame: 'spinner.game',
   spinnerSeen: 'spinner.seen',
   hatGame: 'hat.game',
