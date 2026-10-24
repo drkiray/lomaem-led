@@ -5,28 +5,14 @@ export interface Turn {
   answerer: number;
 }
 
-// Sattolo's algorithm: always a single cycle, so never a fixed point.
-function sattolo(n: number, rng: Rng): number[] {
-  const a = range(n);
-  for (let i = n - 1; i > 0; i--) {
-    const j = Math.floor(rng() * i);
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// Uniform random derangement by rejection (expected ~e tries);
-// falls back to Sattolo if the RNG keeps producing fixed points.
-export function randomDerangement(n: number, rng: Rng): number[] {
+// A round is one chain through all players: whoever just answered asks next,
+// so the answerer of each turn is the asker of the following one. The chain
+// closes on the first asker, so everyone asks once and answers once.
+// `first` pins the opening asker (a new round continues from the last answerer);
+// without it the opener is random.
+export function buildRoundTurns(n: number, rng: Rng, first?: number): Turn[] {
   if (n < 2) throw new Error('Need at least 2 players');
-  for (let attempt = 0; attempt < 100; attempt++) {
-    const p = shuffle(range(n), rng);
-    if (p.every((target, i) => target !== i)) return p;
-  }
-  return sattolo(n, rng);
-}
-
-export function buildRoundTurns(n: number, rng: Rng): Turn[] {
-  const answererOf = randomDerangement(n, rng);
-  return shuffle(range(n), rng).map((asker) => ({ asker, answerer: answererOf[asker] }));
+  const rest = shuffle(range(n).filter((i) => i !== first), rng);
+  const order = first === undefined ? rest : [first, ...rest];
+  return order.map((asker, i) => ({ asker, answerer: order[(i + 1) % n] }));
 }

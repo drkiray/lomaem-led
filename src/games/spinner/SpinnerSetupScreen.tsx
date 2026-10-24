@@ -50,7 +50,7 @@ export function SpinnerSetupScreen() {
 
   return (
     <Screen title="Крутилочка" onBack={back}>
-      <p className="muted">Впишите всех, кто играет. Стрелка решает, кому отвечать, а крутят все по очереди.</p>
+      <p className="muted">Впишите всех, кто играет. Первый крутит случайный игрок, а дальше спрашивает тот, кто только что отвечал.</p>
       {birthday && (
         <div className="players__row players__row--birthday">
           <span className="players__num" aria-hidden="true">🎂</span>

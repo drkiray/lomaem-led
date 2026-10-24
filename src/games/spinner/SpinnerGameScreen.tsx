@@ -105,7 +105,12 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   };
 
   const startRound = (level: Level) =>
-    dispatch({ type: 'startRound', level, turns: buildRoundTurns(state.players.length, Math.random) });
+    dispatch({
+      type: 'startRound',
+      level,
+      // the chain goes on: whoever just answered (or is about to spin) opens the round
+      turns: buildRoundTurns(state.players.length, Math.random, state.phase === 'roundEnd' ? turn.answerer : turn.asker),
+    });
 
   const finish = () => {
     removeKey(KEYS.spinnerGame);
