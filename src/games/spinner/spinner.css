@@ -57,6 +57,10 @@
 /* The card itself: big, in the middle of the screen */
 .modal--card { max-width: 560px; min-height: min(420px, calc(var(--app-h) - 120px)); padding: 28px 24px 24px; justify-content: space-between; }
 .modal--card .modal__body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+/* never a scrollbar on the card: the text shrinks to fit instead (useFitCard),
+   and the gift's bounce may poke out of the body without being clipped */
+.modal-backdrop .modal.modal--card, .modal--card .modal__body { overflow: visible; max-height: none; }
+.modal--card .spin-card__text { font-size: clamp(18px, calc(var(--app-h) * 0.055), 26px); }
 /* Barely visible way out of an uncomfortable card. */
 .spin-card__reroll {
   display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px;
@@ -104,9 +108,20 @@
   box-shadow: 0 0 44px rgba(255, 200, 107, 0.35);
 }
 .modal--festive .modal__title { color: #ffd98f; text-align: center; }
-.spin-card__gift { font-size: 52px; line-height: 1; text-align: center; animation: gift-bounce 1.6s ease-in-out infinite; }
+.spin-card__gift { font-size: clamp(34px, calc(var(--app-h) * 0.08), 52px); line-height: 1; text-align: center; padding-top: 6px; animation: gift-bounce 1.6s ease-in-out infinite; }
 @keyframes gift-bounce { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(4deg); } }
 @media (prefers-reduced-motion: reduce) { .spin-card__gift { animation: none; } }
+/* Phone on its side: little height, so the card's chrome gets compact and the
+   question keeps a readable size. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .modal-backdrop:has(.modal--card) { padding-block: 40px; }
+  .modal-backdrop .modal.modal--card { min-height: 0; padding: 14px 20px; gap: 10px; }
+  .modal--card .modal__title { font-size: 16px; }
+  .modal--card .modal__body { gap: 6px; }
+  .modal--card .spin-card__gift { font-size: 28px; padding-top: 4px; }
+  .modal--card .btn--lg { min-height: 44px; padding-block: 8px; }
+  .modal--card + .modal-below { bottom: max(4px, env(safe-area-inset-bottom)); }
+}
 
 /* End-of-game summary */
 .summary { display: flex; flex-direction: column; gap: 16px; }

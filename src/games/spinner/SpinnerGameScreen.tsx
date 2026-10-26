@@ -17,6 +17,7 @@ import { computeStopRotation, normalizeDeg } from './geometry';
 import { currentTurn, restoreSpinnerGame, spinnerReducer, type SpinnerState } from './state';
 import { buildRoundTurns } from './turns';
 import { SpinnerSummaryView } from './SpinnerSummaryView';
+import { useFitCard } from './useFitCard';
 import { useSpin } from './useSpin';
 import { Wheel } from './Wheel';
 import './spinner.css';
@@ -74,6 +75,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   const card = state.cardId ? ALL_CARDS.find((c) => c.id === state.cardId) ?? null : null;
   const birthdayName = state.birthday ? state.players[state.birthday.index] : '';
   const isBirthdayCard = card?.birthday === true;
+  const cardTextRef = useFitCard<HTMLParagraphElement>(state.phase === 'card' ? state.cardId : null);
 
   const spin = async () => {
     if (state.phase !== 'ready' || busy.current) return;
@@ -194,7 +196,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         }
       >
         {isBirthdayCard && <div className="spin-card__gift" aria-hidden="true">🎁</div>}
-        <p className="spin-card__text" key={card?.id}>
+        <p className="spin-card__text" key={card?.id} ref={cardTextRef}>
           <span className="spin-card__name">{answerer}</span>, {card ? afterAddress(fillTemplate(card.text, asker, answerer, birthdayName)) : ''}
         </p>
       </Modal>
