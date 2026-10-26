@@ -161,9 +161,6 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         </div>
       </header>
 
-      <p className="spinner-game__level">
-        Раунд {state.level}: {LEVEL_TITLES[state.level]} · ход {state.turnIndex + 1} из {state.turns.length}
-      </p>
       <p className="spinner-game__turn">
         Крутит: <b>{asker}</b>
       </p>
@@ -175,7 +172,6 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         disabled={state.phase !== 'ready'}
         onSpin={spin}
       />
-      <p className="muted center spinner-game__hint">{state.phase === 'ready' ? `${asker}, жми на центр круга` : ' '}</p>
 
       <Modal
         open={state.phase === 'card' && card !== null}

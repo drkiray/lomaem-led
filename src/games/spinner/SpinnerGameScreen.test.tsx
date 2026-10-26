@@ -24,7 +24,7 @@ test('shows whose turn it is', () => {
   save();
   renderWithProviders(<SpinnerGameScreen />);
   expect(screen.getByText(/Крутит:/)).toHaveTextContent('Крутит: Маша');
-  expect(screen.getByText(/Раунд 1: Поверхность/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('card shows asker → answerer and filled text; Готово passes the turn', async () => {
@@ -43,7 +43,7 @@ test('round end offers next level', async () => {
   renderWithProviders(<SpinnerGameScreen />);
   expect(screen.getByRole('dialog', { name: 'Раунд 1 завершён' })).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Раунд 2' }));
-  expect(screen.getByText(/Раунд 2: Погружение/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('after level 3 can finish the game', async () => {
@@ -60,7 +60,7 @@ test('level pill switches round after confirmation', async () => {
   renderWithProviders(<SpinnerGameScreen />);
   await userEvent.click(screen.getByRole('button', { name: '3' }));
   await userEvent.click(screen.getByRole('button', { name: 'Перейти' }));
-  expect(screen.getByText(/Раунд 3: Глубина/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('exit via ✕ asks for confirmation', async () => {

@@ -50,7 +50,6 @@
 }
 .level-pill.is-active { background: var(--ice); color: #021320; box-shadow: var(--ice-glow); }
 .level-pill:disabled:not(.is-active) { opacity: 0.4; }
-.spinner-game__level { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }
 .spinner-game__turn { margin: 0; text-align: center; font-size: 22px; font-family: var(--font-display); font-weight: 600; }
 .spinner-game__turn b { color: var(--ice); text-shadow: var(--ice-glow); }
 .spin-card__names { margin: 0; font-size: 18px; text-align: center; }
@@ -75,15 +74,13 @@
     --fit: calc(var(--app-h) - var(--pad-top) - var(--pad-bottom));
     height: var(--fit); min-height: 0;
     display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; row-gap: 8px;
-    grid-template-areas: 'wheel header' 'wheel level' 'wheel turn' 'wheel hint';
-    grid-template-rows: auto auto 1fr auto; align-items: center;
+    grid-template-areas: 'wheel header' 'wheel turn';
+    grid-template-rows: auto 1fr; align-items: center;
   }
   .spinner-game__header { grid-area: header; }
-  .spinner-game__level { grid-area: level; }
   .spinner-game__turn { grid-area: turn; font-size: 28px; }
   /* 28px short of the full height leaves room for the wheel's glow at the screen edge */
   .spinner-game > .wheel { grid-area: wheel; width: min(calc(var(--fit) - 28px), 55vw); margin-left: 14px; }
-  .spinner-game__hint { grid-area: hint; margin: 0; }
 }
 
 /* Birthday mode: highlighted name field in setup, festive card in the game */
