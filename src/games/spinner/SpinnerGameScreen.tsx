@@ -11,7 +11,7 @@ import { Button } from '../../ui/Button';
 import { FullscreenButton, LandscapePrompt } from '../../ui/LandscapePrompt';
 import { Modal } from '../../ui/Modal';
 import { Screen } from '../../ui/Screen';
-import { LEVELS, LEVEL_TITLES, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
+import { LEVEL_TITLES, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
 import { computeStopRotation, normalizeDeg } from './geometry';
 import { currentTurn, restoreSpinnerGame, spinnerReducer, type SpinnerState } from './state';
 import { buildRoundTurns } from './turns';
@@ -41,7 +41,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   const { settings } = useSettings();
   const fx = useFeedback();
   const [state, dispatch] = useReducer(spinnerReducer, initial);
-  const [pendingLevel, setPendingLevel] = useState<Level | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
   const busy = useRef(false);
   const { arrowRef, spinTo, setRotation } = useSpin(state.players.length, () => fx.sfx('tick'));
@@ -140,24 +140,19 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   return (
     <div className="spinner-game">
       <header className="spinner-game__header">
-        <button type="button" className="icon-btn" aria-label="Назад" onClick={back}>←</button>
-        <div className="level-pills" role="group" aria-label="Раунд">
-          {LEVELS.map((level) => (
-            <button
-              key={level}
-              type="button"
-              className={`level-pill ${level === state.level ? 'is-active' : ''}`}
-              aria-pressed={level === state.level}
-              disabled={state.phase !== 'ready'}
-              onClick={() => level !== state.level && setPendingLevel(level)}
-            >
-              {level}
-            </button>
-          ))}
-        </div>
-        <div className="game-header__actions">
+        <div className="spinner-game__side">
           <FullscreenButton landscape={landscape} />
-          <button type="button" className="icon-btn" aria-label="Завершить" onClick={() => setConfirmExit(true)}>✕</button>
+        </div>
+        <h1 className="spinner-game__round">
+          Раунд {state.level} <span>«{LEVEL_TITLES[state.level]}»</span>
+        </h1>
+        <div className="spinner-game__side spinner-game__side--end">
+          <button type="button" className="icon-btn" aria-label="Меню игры" onClick={() => setMenuOpen(true)}>
+            <svg className="icon-btn__svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -200,7 +195,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
             </>
           ) : (
             <>
-              <Button variant="ghost" onClick={finish}>Завершить игру</Button>
+              <Button variant="ghost" onClick={finish}>Завершить партию</Button>
               <Button onClick={() => startRound(3)}>Ещё круг</Button>
             </>
           )
@@ -213,25 +208,23 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
       </Modal>
 
       <Modal
-        open={pendingLevel !== null}
-        title={`Перейти к раунду ${pendingLevel}?`}
-        actions={
-          <>
-            <Button variant="ghost" onClick={() => setPendingLevel(null)}>Отмена</Button>
-            <Button onClick={() => { if (pendingLevel) startRound(pendingLevel); setPendingLevel(null); }}>Перейти</Button>
-          </>
-        }
+        open={menuOpen}
+        title="Пауза"
+        actions={<Button onClick={() => setMenuOpen(false)}>Продолжить</Button>}
       >
-        <p>Круг начнётся заново: каждый снова покрутит и ответит.</p>
+        <div className="stack">
+          <Button variant="ghost" onClick={back}>Вернуться в меню</Button>
+          <Button variant="danger" onClick={() => { setMenuOpen(false); setConfirmExit(true); }}>Завершить партию</Button>
+        </div>
       </Modal>
 
       <Modal
         open={confirmExit}
-        title="Завершить игру?"
+        title="Завершить партию?"
         actions={
           <>
             <Button variant="ghost" onClick={() => setConfirmExit(false)}>Отмена</Button>
-            <Button variant="danger" onClick={finish}>Завершить игру</Button>
+            <Button variant="danger" onClick={finish}>Завершить партию</Button>
           </>
         }
       >

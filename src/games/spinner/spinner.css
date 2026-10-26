@@ -42,14 +42,14 @@
 
 .spinner-game { display: flex; flex-direction: column; gap: 14px; min-height: calc(var(--app-h) - var(--pad-top) - var(--pad-bottom)); }
 .spinner-game__header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.level-pills { display: flex; gap: 8px; }
-.level-pill {
-  width: 44px; height: 44px; border-radius: 50%;
-  border: 1px solid var(--border); background: var(--surface);
-  font-family: var(--font-display); font-weight: 600; color: var(--muted);
+.spinner-game__side { display: flex; gap: 8px; min-width: 44px; }
+.spinner-game__side--end { justify-content: flex-end; }
+.spinner-game__round {
+  flex: 1; margin: 0; text-align: center;
+  font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: 0.02em; color: var(--text);
 }
-.level-pill.is-active { background: var(--ice); color: #021320; box-shadow: var(--ice-glow); }
-.level-pill:disabled:not(.is-active) { opacity: 0.4; }
+.spinner-game__round span { display: inline-block; color: var(--ice); text-shadow: var(--ice-glow); }
+.icon-btn__svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .spinner-game__turn { margin: 0; text-align: center; font-size: 22px; font-family: var(--font-display); font-weight: 600; }
 .spinner-game__turn b { color: var(--ice); text-shadow: var(--ice-glow); }
 .spin-card__names { margin: 0; font-size: 18px; text-align: center; }

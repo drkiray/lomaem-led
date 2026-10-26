@@ -24,7 +24,7 @@ test('shows whose turn it is', () => {
   save();
   renderWithProviders(<SpinnerGameScreen />);
   expect(screen.getByText(/, крути!/)).toHaveTextContent('Маша, крути!');
-  expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Раунд 1 «Поверхность»');
 });
 
 test('card shows asker → answerer and filled text; Готово passes the turn', async () => {
@@ -43,31 +43,45 @@ test('round end offers next level', async () => {
   renderWithProviders(<SpinnerGameScreen />);
   expect(screen.getByRole('dialog', { name: 'Раунд 1 завершён' })).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Раунд 2' }));
-  expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Раунд 2 «Погружение»');
 });
 
 test('after level 3 can finish the game', async () => {
   save({ phase: 'roundEnd', level: 3, turnIndex: 1 });
   const { back, navigate } = renderWithProviders(<SpinnerGameScreen />);
-  await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить партию' }));
   expect(localStorage.getItem('ll.spinner.game')).toBeNull();
   expect(back).toHaveBeenCalled(); // pop back to the menu entry, no phantom history entry
   expect(navigate).not.toHaveBeenCalled();
 });
 
-test('level pill switches round after confirmation', async () => {
-  save();
+test('no round switcher: the header just names the round', () => {
+  save({ level: 3 });
   renderWithProviders(<SpinnerGameScreen />);
-  await userEvent.click(screen.getByRole('button', { name: '3' }));
-  await userEvent.click(screen.getByRole('button', { name: 'Перейти' }));
-  expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Раунд 3 «Глубина»');
+  expect(screen.queryByRole('button', { name: '3' })).toBeNull();
 });
 
-test('exit via ✕ asks for confirmation', async () => {
+test('gear menu: «Вернуться в меню» keeps the game, «Продолжить» closes the menu', async () => {
+  save();
+  const { back } = renderWithProviders(<SpinnerGameScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Меню игры' }));
+  expect(screen.getByRole('dialog', { name: 'Пауза' })).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Продолжить' }));
+  expect(screen.queryByRole('dialog', { name: 'Пауза' })).toBeNull();
+  await userEvent.click(screen.getByRole('button', { name: 'Меню игры' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Вернуться в меню' }));
+  expect(back).toHaveBeenCalled();
+  expect(localStorage.getItem('ll.spinner.game')).not.toBeNull();
+});
+
+test('«Завершить партию» from the gear menu asks for confirmation', async () => {
   save();
   const { back, navigate } = renderWithProviders(<SpinnerGameScreen />);
-  await userEvent.click(screen.getByRole('button', { name: 'Завершить' }));
-  await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Меню игры' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить партию' }));
+  expect(screen.getByRole('dialog', { name: 'Завершить партию?' })).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить партию' }));
   expect(back).toHaveBeenCalled(); // pop back to the menu entry, no phantom history entry
   expect(navigate).not.toHaveBeenCalled();
   expect(localStorage.getItem('ll.spinner.game')).toBeNull();
@@ -148,9 +162,10 @@ test('birthday card is festive, names the birthday person and keeps its kind on 
 test('ending a played game shows the summary; «В меню» clears it', async () => {
   save({ log: [{ asker: 0, answerer: 1, cardId: 'l1-q1', ms: 120000, rerolls: 0 }, { asker: 1, answerer: 0, cardId: 'l1-q2', ms: 30000, rerolls: 1 }] });
   const { back } = renderWithProviders(<SpinnerGameScreen />);
-  await userEvent.click(screen.getByRole('button', { name: 'Завершить' }));
-  expect(screen.getByRole('dialog', { name: 'Завершить игру?' })).toHaveTextContent('Покажем итоги');
-  await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Меню игры' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить партию' }));
+  expect(screen.getByRole('dialog', { name: 'Завершить партию?' })).toHaveTextContent('Покажем итоги');
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить партию' }));
   expect(screen.getByRole('heading', { name: 'Итоги вечера' })).toBeInTheDocument();
   expect(screen.getByText('Душа разговора')).toBeInTheDocument();
   expect(screen.getByText('Самый долгий ответ')).toBeInTheDocument(); // one award each
