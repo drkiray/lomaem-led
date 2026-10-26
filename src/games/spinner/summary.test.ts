@@ -27,12 +27,11 @@ test('counts and awards', () => {
   expect(s).toMatchObject({ questions: 2, actions: 2, rounds: 1, deepest: 2, durationMs: 65 * 60 * 1000 });
   const byTitle = Object.fromEntries(s.awards.map((a) => [a.title, a]));
   expect(byTitle['Душа разговора']).toMatchObject({ name: 'Боря', detail: '5 мин в ответах' });
-  expect(byTitle['Самый долгий ответ'].name).toBe('Боря');
+  // Боря already has one, so the longest answer goes to the next longest: Вика
+  expect(byTitle['Самый долгий ответ']).toMatchObject({ name: 'Вика', detail: '40 с' });
   expect(byTitle['Самый долгий ответ'].quote).toBeTruthy();
   expect(byTitle['Блиц']).toMatchObject({ name: 'Аня', detail: 'ответ за 10 с' });
-  expect(byTitle['Умеет разговорить'].name).toBe('Аня');
-  expect(byTitle['Загадка вечера']).toMatchObject({ name: 'Вика', detail: '2 раза просил(а) другую карточку' });
-  expect(byTitle['Человек действия']).toBeUndefined(); // Аня and Вика did one each
+  expect(s.awards).toHaveLength(3); // three players, one award each
 });
 
 test('nothing timed (old save) gives no time awards, no crash', () => {
@@ -52,7 +51,18 @@ test('everyone leaves with at least one award', () => {
   const s = summarize({ ...game(log), players: many });
   for (let i = 0; i < many.length; i++) expect(s.awards.some((a) => a.player === i)).toBe(true);
   const byTitle = Object.fromEntries(s.awards.map((a) => [a.title, a.name]));
-  expect(byTitle['Открытая книга']).toBe('Даша'); // answered, never asked for another card
+  expect(byTitle['Самый долгий ответ']).toBe('Даша');
+  expect(byTitle['Загадка вечера']).toBe('Гена');
   expect(byTitle['Лучший слушатель']).toBe('Егор');
+  expect(s.awards).toHaveLength(many.length);
   expect(s.awards.filter((a) => a.title === 'Тёплое сердце').length).toBeGreaterThan(0);
+});
+
+test('nobody gets more than one award', () => {
+  const many = ['Аня', 'Боря', 'Вика', 'Гена'];
+  const log = [e(0, 1, 'l1-q1', 300, 3), e(1, 2, 'l1-a1', 5), e(2, 3, 'l1-a2', 5), e(3, 1, 'l1-a3', 400), e(1, 0, 'l3-q1', 9)];
+  const s = summarize({ ...game(log), players: many });
+  const counts = s.awards.reduce<Record<number, number>>((m, a) => ({ ...m, [a.player]: (m[a.player] ?? 0) + 1 }), {});
+  expect(Object.values(counts).every((c) => c === 1)).toBe(true);
+  expect(Object.keys(counts)).toHaveLength(4);
 });

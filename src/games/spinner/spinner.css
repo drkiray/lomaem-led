@@ -40,7 +40,7 @@
 @keyframes hub-nudge { 0%, 55%, 100% { transform: rotate(0); } 25% { transform: rotate(40deg); } }
 @keyframes hub-pulse { 0%, 100% { box-shadow: var(--ice-glow); } 50% { box-shadow: 0 0 34px rgba(127, 231, 255, 0.9); } }
 
-.spinner-game { display: flex; flex-direction: column; gap: 14px; min-height: calc(100dvh - 32px); }
+.spinner-game { display: flex; flex-direction: column; gap: 14px; min-height: calc(var(--app-h) - var(--pad-top) - var(--pad-bottom)); }
 .spinner-game__header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .level-pills { display: flex; gap: 8px; }
 .level-pill {
@@ -72,7 +72,7 @@
    No overflow clipping here: it would cut the glows of the wheel and the pills. */
 @media (orientation: landscape) and (max-height: 600px) {
   .spinner-game {
-    --fit: calc(100dvh - var(--pad-top) - var(--pad-bottom));
+    --fit: calc(var(--app-h) - var(--pad-top) - var(--pad-bottom));
     height: var(--fit); min-height: 0;
     display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; row-gap: 8px;
     grid-template-areas: 'wheel header' 'wheel level' 'wheel turn' 'wheel hint';

@@ -18,7 +18,7 @@
 .handoff__name { margin: 0; font-family: var(--font-display); font-size: 36px; color: var(--ice); text-shadow: var(--ice-glow); }
 .handoff__title { margin: 0; font-family: var(--font-display); font-size: 20px; font-weight: 600; }
 
-.hat-game { display: flex; flex-direction: column; gap: 16px; min-height: calc(100dvh - 32px); }
+.hat-game { display: flex; flex-direction: column; gap: 16px; min-height: calc(var(--app-h) - var(--pad-top) - var(--pad-bottom)); }
 .hat-game__header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .hat-game__round { flex: 1; text-align: center; color: var(--muted); font-size: 14px; font-weight: 700; }
 .hat-view { flex: 1; display: flex; flex-direction: column; gap: 16px; justify-content: center; text-align: center; }

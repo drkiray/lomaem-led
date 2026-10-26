@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { setMusicScene, setMusicVolume, type MusicScene } from '../audio/music';
 import { preloadSfx, type SfxName } from '../audio/sfx';
 import { useFeedback } from '../audio/useFeedback';
+import { useViewportHeight } from '../lib/useViewportHeight';
 import { useSettings } from '../settings/SettingsContext';
 import { useNav } from './nav';
 import type { RouteName } from './nav';
@@ -22,6 +23,7 @@ function clickSound(el: HTMLElement): SfxName {
 // Sound-effect samples are decoded up front so the very first tick isn't synth.
 export function AppEffects() {
   const { musicVolume } = useSettings().settings;
+  useViewportHeight();
 
   const { route } = useNav();
   const fx = useFeedback();

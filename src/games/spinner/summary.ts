@@ -63,75 +63,54 @@ export function summarize(state: SpinnerState): SpinnerSummary {
   const birthdayName = state.birthday ? players[state.birthday.index] : '';
   const timed = log.filter((e) => e.ms > 0);
   const awards: Award[] = [];
+  // One award per player: each nomination goes to the best player still without one.
+  const taken = () => new Set(awards.map((a) => a.player));
+  const free = () => players.map((_, i) => i).filter((i) => !taken().has(i));
+  const freeEntries = (entries: LogEntry[]) => entries.filter((e) => !taken().has(e.answerer));
+  const give = (player: number, icon: string, title: string, detail: string, quote?: string) =>
+    awards.push({ player, icon, title, name: players[player], detail, quote });
 
-  // Who talked the most overall
-  if (timed.length >= 2) {
-    const talk = totals(timed, n, (e) => e.answerer, (e) => e.ms);
-    const i = best(players.map((_, idx) => idx), (idx) => talk[idx])!;
-    awards.push({ player: i, icon: '🗣️', title: 'Душа разговора', name: players[i], detail: `${formatDuration(talk[i])} в ответах` });
+  // Birthday mode: the birthday person's award comes first, it is theirs
+  const aboutBirthday = log.filter((e) => card(e)?.birthday).length;
+  if (state.birthday && aboutBirthday > 0) {
+    give(state.birthday.index, '🎁', 'Главный герой', `${aboutBirthday} ${plural(aboutBirthday, 'вопрос', 'вопроса', 'вопросов')} о нём или о ней`);
   }
 
+  // Who talked the most overall
+  const talk = totals(timed, n, (e) => e.answerer, (e) => e.ms);
+  const talker = best(free().filter((i) => talk[i] > 0), (i) => talk[i]);
+  if (timed.length >= 2 && talker !== null) give(talker, '🗣️', 'Душа разговора', `${formatDuration(talk[talker])} в ответах`);
+
   // The single longest answer, with the question that started it
-  const longest = best(timed, (e) => e.ms);
+  const longest = best(freeEntries(timed), (e) => e.ms);
   if (longest) {
     const c = card(longest);
-    awards.push({
-      player: longest.answerer,
-      icon: '⏳',
-      title: 'Самый долгий ответ',
-      name: players[longest.answerer],
-      detail: formatDuration(longest.ms),
-      quote: c ? fillTemplate(c.text, players[longest.asker], players[longest.answerer], birthdayName) : undefined,
-    });
+    give(longest.answerer, '⏳', 'Самый долгий ответ', formatDuration(longest.ms),
+      c ? fillTemplate(c.text, players[longest.asker], players[longest.answerer], birthdayName) : undefined);
   }
 
   // The quickest answer (a few seconds of thinking at least, so not a mis-tap)
-  const quick = timed.filter((e) => e.ms >= 3000 && e !== longest);
-  if (timed.length >= 4 && quick.length > 0) {
-    const fastest = best(quick, (e) => -e.ms)!;
-    awards.push({ player: fastest.answerer, icon: '⚡', title: 'Блиц', name: players[fastest.answerer], detail: `ответ за ${formatDuration(fastest.ms)}` });
-  }
+  const fastest = best(freeEntries(timed).filter((e) => e.ms >= 3000), (e) => -e.ms);
+  if (timed.length >= 4 && fastest) give(fastest.answerer, '⚡', 'Блиц', `ответ за ${formatDuration(fastest.ms)}`);
 
   // Whose questions got people talking: longest answers on average
   const askedCount = totals(timed, n, (e) => e.asker, () => 1);
   const askedTime = totals(timed, n, (e) => e.asker, (e) => e.ms);
-  const askers = players.map((_, idx) => idx).filter((idx) => askedCount[idx] > 0);
-  if (askers.length >= 3) {
-    const i = best(askers, (idx) => askedTime[idx] / askedCount[idx])!;
-    awards.push({
-      player: i,
-      icon: '🔑',
-      title: 'Умеет разговорить',
-      name: players[i],
-      detail: `в среднем ${formatDuration(askedTime[i] / askedCount[i])} на ответ`,
-    });
+  const askers = players.map((_, i) => i).filter((i) => askedCount[i] > 0);
+  const opener = best(free().filter((i) => askedCount[i] > 0), (i) => askedTime[i] / askedCount[i]);
+  if (askers.length >= 3 && opener !== null) {
+    give(opener, '🔑', 'Умеет разговорить', `в среднем ${formatDuration(askedTime[opener] / askedCount[opener])} на ответ`);
   }
 
   // «не хочу отвечать» champion — only when it happened at all
   const rerolls = totals(log, n, (e) => e.answerer, (e) => e.rerolls);
-  const shy = best(players.map((_, idx) => idx), (idx) => rerolls[idx])!;
-  if (rerolls[shy] > 0) {
-    awards.push({ player: shy, icon: '🙈', title: 'Загадка вечера', name: players[shy], detail: `${times(rerolls[shy])} просил(а) другую карточку` });
-  }
+  const shy = best(free().filter((i) => rerolls[i] > 0), (i) => rerolls[i]);
+  if (shy !== null) give(shy, '🙈', 'Загадка вечера', `${times(rerolls[shy])} просил(а) другую карточку`);
 
   // Most actions done
   const acts = totals(log, n, (e) => e.answerer, (e) => (card(e)?.kind === 'action' ? 1 : 0));
-  const doer = best(players.map((_, idx) => idx), (idx) => acts[idx])!;
-  if (acts[doer] >= 2) {
-    awards.push({ player: doer, icon: '🎭', title: 'Человек действия', name: players[doer], detail: `${acts[doer]} ${plural(acts[doer], 'действие', 'действия', 'действий')}` });
-  }
-
-  // Birthday mode: how much was said about the birthday person
-  const aboutBirthday = log.filter((e) => card(e)?.birthday).length;
-  if (state.birthday && aboutBirthday > 0) {
-    awards.push({
-      player: state.birthday.index,
-      icon: '🎁',
-      title: 'Главный герой',
-      name: birthdayName,
-      detail: `${aboutBirthday} ${plural(aboutBirthday, 'вопрос', 'вопроса', 'вопросов')} о нём или о ней`,
-    });
-  }
+  const doer = best(free().filter((i) => acts[i] >= 2), (i) => acts[i]);
+  if (doer !== null) give(doer, '🎭', 'Человек действия', `${acts[doer]} ${plural(acts[doer], 'действие', 'действия', 'действий')}`);
 
   awards.push(...consolations(state, awards));
 

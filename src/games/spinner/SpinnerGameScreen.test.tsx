@@ -152,7 +152,7 @@ test('ending a played game shows the summary; «В меню» clears it', async 
   await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
   expect(screen.getByRole('heading', { name: 'Итоги вечера' })).toBeInTheDocument();
   expect(screen.getByText('Душа разговора')).toBeInTheDocument();
-  expect(screen.getByText('Загадка вечера')).toBeInTheDocument();
+  expect(screen.getByText('Самый долгий ответ')).toBeInTheDocument(); // one award each
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).phase).toBe('summary'); // survives a reload
   await userEvent.click(screen.getByRole('button', { name: 'В меню' }));
   expect(localStorage.getItem('ll.spinner.game')).toBeNull();
