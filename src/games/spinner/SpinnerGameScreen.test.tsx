@@ -178,6 +178,7 @@ test('ending a played game shows the summary; «В меню» clears it', async 
 test('«Новая игра» from the summary opens setup', async () => {
   save({ phase: 'summary', log: [{ asker: 0, answerer: 1, cardId: 'l1-q1', ms: 1000, rerolls: 0 }] });
   const { navigate } = renderWithProviders(<SpinnerGameScreen />);
+  expect(screen.queryByRole('button', { name: 'Назад' })).toBeNull();
   await userEvent.click(screen.getByRole('button', { name: 'Новая игра' }));
   expect(navigate).toHaveBeenCalledWith('spinner-setup', { replace: true });
   expect(localStorage.getItem('ll.spinner.game')).toBeNull();

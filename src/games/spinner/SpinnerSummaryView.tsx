@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { plural } from '../../lib/plural';
 import { Button } from '../../ui/Button';
 import { Screen } from '../../ui/Screen';
@@ -11,8 +12,30 @@ interface Props {
   onNewGame: () => void;
 }
 
+// True while part of the page is still below the fold.
+function useMoreBelow(): boolean {
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const doc = document.documentElement;
+      setMore(window.scrollY + window.innerHeight < doc.scrollHeight - 24);
+    };
+    check();
+    const late = setTimeout(check, 600); // after the awards' pop-in
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      clearTimeout(late);
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
+  }, []);
+  return more;
+}
+
 export function SpinnerSummaryView({ state, onMenu, onNewGame }: Props) {
   const s = summarize(state);
+  const more = useMoreBelow();
   const stats: [number | string, string][] = [
     [s.questions, plural(s.questions, 'вопрос', 'вопроса', 'вопросов')],
     [s.actions, plural(s.actions, 'действие', 'действия', 'действий')],
@@ -20,7 +43,7 @@ export function SpinnerSummaryView({ state, onMenu, onNewGame }: Props) {
     [s.deepest ? LEVEL_TITLES[s.deepest] : '—', 'самый глубокий уровень'],
   ];
   return (
-    <Screen title="Итоги вечера" onBack={onMenu}>
+    <Screen title="Итоги вечера">
       <div className="summary">
         <div className="summary__hero">
           <div className="summary__hero-icon" aria-hidden="true">🎉</div>
@@ -54,6 +77,11 @@ export function SpinnerSummaryView({ state, onMenu, onNewGame }: Props) {
             ))}
           </ul>
         )}
+
+        <div className={`summary__more ${more ? 'is-visible' : ''}`} aria-hidden="true">
+          <span className="summary__more-chevron">⌄</span>
+          листай вниз
+        </div>
 
         <div className="summary__actions">
           <Button variant="ghost" onClick={onMenu}>В меню</Button>

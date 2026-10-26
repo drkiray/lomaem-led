@@ -138,4 +138,16 @@
 .summary__quote { margin-top: 6px !important; font-style: italic; color: var(--text); opacity: 0.85; }
 .summary__actions { display: flex; gap: 10px; }
 .summary__actions > * { flex: 1; }
-@media (prefers-reduced-motion: reduce) { .summary__hero, .summary__award { animation: none; } }
+/* «there is more below»: a fade over the bottom edge with a nudging chevron */
+.summary__more {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0;
+  height: 110px; padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, transparent, rgba(5, 10, 20, 0.92) 70%);
+  color: var(--ice); font-size: 12px; letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.summary__more.is-visible { opacity: 1; }
+.summary__more-chevron { font-size: 28px; line-height: 0.8; text-shadow: var(--ice-glow); animation: more-nudge 1.4s ease-in-out infinite; }
+@keyframes more-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .summary__hero, .summary__award, .summary__more-chevron { animation: none; } }
