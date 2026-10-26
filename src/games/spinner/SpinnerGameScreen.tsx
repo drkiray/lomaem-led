@@ -177,6 +177,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         open={state.phase === 'card' && card !== null}
         title={isBirthdayCard ? 'Вопрос про именинника' : card?.kind === 'action' ? 'Действие' : 'Вопрос'}
         festive={isBirthdayCard}
+        hideTitle={!isBirthdayCard && card?.kind !== 'action'}
         actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone', at: Date.now() })}>Готово</Button>}
       >
         {isBirthdayCard && <div className="spin-card__gift" aria-hidden="true">🎁</div>}

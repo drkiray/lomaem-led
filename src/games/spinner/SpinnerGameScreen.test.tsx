@@ -110,6 +110,7 @@ test('«поменять карточку» replaces the question with another q
   save({ phase: 'card', cardId: 'l1-q1', usedIds: ['l1-q1'] });
   renderWithProviders(<SpinnerGameScreen />);
   const dialog = screen.getByRole('dialog', { name: 'Вопрос' });
+  expect(screen.queryByRole('heading', { name: 'Вопрос' })).toBeNull(); // no visible title on a plain question
   const before = dialog.querySelector('.spin-card__text')!.textContent;
   await userEvent.click(screen.getByRole('button', { name: /поменять карточку/ }));
   expect(screen.getByRole('dialog', { name: 'Вопрос' }).querySelector('.spin-card__text')!.textContent).not.toBe(before);
