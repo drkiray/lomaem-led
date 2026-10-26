@@ -7,6 +7,7 @@ import type { LogEntry, SpinnerState } from './state';
 const CARDS = new Map<string, Card>([...SPINNER_CARDS, ...BIRTHDAY_CARDS].map((c) => [c.id, c]));
 
 export interface Award {
+  player: number;
   icon: string;
   title: string;
   name: string;
@@ -67,7 +68,7 @@ export function summarize(state: SpinnerState): SpinnerSummary {
   if (timed.length >= 2) {
     const talk = totals(timed, n, (e) => e.answerer, (e) => e.ms);
     const i = best(players.map((_, idx) => idx), (idx) => talk[idx])!;
-    awards.push({ icon: '🗣️', title: 'Душа разговора', name: players[i], detail: `${formatDuration(talk[i])} в ответах` });
+    awards.push({ player: i, icon: '🗣️', title: 'Душа разговора', name: players[i], detail: `${formatDuration(talk[i])} в ответах` });
   }
 
   // The single longest answer, with the question that started it
@@ -75,6 +76,7 @@ export function summarize(state: SpinnerState): SpinnerSummary {
   if (longest) {
     const c = card(longest);
     awards.push({
+      player: longest.answerer,
       icon: '⏳',
       title: 'Самый долгий ответ',
       name: players[longest.answerer],
@@ -87,7 +89,7 @@ export function summarize(state: SpinnerState): SpinnerSummary {
   const quick = timed.filter((e) => e.ms >= 3000 && e !== longest);
   if (timed.length >= 4 && quick.length > 0) {
     const fastest = best(quick, (e) => -e.ms)!;
-    awards.push({ icon: '⚡', title: 'Блиц', name: players[fastest.answerer], detail: `ответ за ${formatDuration(fastest.ms)}` });
+    awards.push({ player: fastest.answerer, icon: '⚡', title: 'Блиц', name: players[fastest.answerer], detail: `ответ за ${formatDuration(fastest.ms)}` });
   }
 
   // Whose questions got people talking: longest answers on average
@@ -97,6 +99,7 @@ export function summarize(state: SpinnerState): SpinnerSummary {
   if (askers.length >= 3) {
     const i = best(askers, (idx) => askedTime[idx] / askedCount[idx])!;
     awards.push({
+      player: i,
       icon: '🔑',
       title: 'Умеет разговорить',
       name: players[i],
@@ -108,26 +111,29 @@ export function summarize(state: SpinnerState): SpinnerSummary {
   const rerolls = totals(log, n, (e) => e.answerer, (e) => e.rerolls);
   const shy = best(players.map((_, idx) => idx), (idx) => rerolls[idx])!;
   if (rerolls[shy] > 0) {
-    awards.push({ icon: '🙈', title: 'Загадка вечера', name: players[shy], detail: `${times(rerolls[shy])} просил(а) другую карточку` });
+    awards.push({ player: shy, icon: '🙈', title: 'Загадка вечера', name: players[shy], detail: `${times(rerolls[shy])} просил(а) другую карточку` });
   }
 
   // Most actions done
   const acts = totals(log, n, (e) => e.answerer, (e) => (card(e)?.kind === 'action' ? 1 : 0));
   const doer = best(players.map((_, idx) => idx), (idx) => acts[idx])!;
   if (acts[doer] >= 2) {
-    awards.push({ icon: '🎭', title: 'Человек действия', name: players[doer], detail: `${acts[doer]} ${plural(acts[doer], 'действие', 'действия', 'действий')}` });
+    awards.push({ player: doer, icon: '🎭', title: 'Человек действия', name: players[doer], detail: `${acts[doer]} ${plural(acts[doer], 'действие', 'действия', 'действий')}` });
   }
 
   // Birthday mode: how much was said about the birthday person
   const aboutBirthday = log.filter((e) => card(e)?.birthday).length;
   if (state.birthday && aboutBirthday > 0) {
     awards.push({
+      player: state.birthday.index,
       icon: '🎁',
       title: 'Главный герой',
       name: birthdayName,
       detail: `${aboutBirthday} ${plural(aboutBirthday, 'вопрос', 'вопроса', 'вопросов')} о нём или о ней`,
     });
   }
+
+  awards.push(...consolations(state, awards));
 
   const levels = log.map((e) => card(e)?.level).filter((l): l is Level => l !== undefined);
   return {
@@ -138,4 +144,78 @@ export function summarize(state: SpinnerState): SpinnerSummary {
     deepest: levels.length ? (Math.max(...levels) as Level) : null,
     awards,
   };
+}
+
+interface Candidate {
+  icon: string;
+  title: string;
+  // higher fits better; null: doesn't fit this player
+  score: (i: number) => number | null;
+  detail: (i: number) => string;
+}
+
+const GENERIC: Omit<Candidate, 'score'>[] = [
+  { icon: '💛', title: 'Тёплое сердце', detail: () => 'за искренность и хорошую компанию' },
+  { icon: '✨', title: 'Искра компании', detail: () => 'без тебя вечер был бы совсем другим' },
+  { icon: '🍀', title: 'Любимчик стрелки', detail: () => 'стрелка явно к тебе неравнодушна' },
+];
+
+// Everyone leaves with an award: players the main nominations missed get one
+// that still says something true about their evening, else a warm generic one.
+function consolations(state: SpinnerState, given: Award[]): Award[] {
+  const { log, players } = state;
+  const n = players.length;
+  const credited = new Set(given.map((a) => a.player));
+  const titles = new Set(given.map((a) => a.title));
+  const timed = log.filter((e) => e.ms > 0);
+  const answered = totals(log, n, (e) => e.answerer, () => 1);
+  const asked = totals(log, n, (e) => e.asker, () => 1);
+  const rerolls = totals(log, n, (e) => e.answerer, (e) => e.rerolls);
+  const timedCount = totals(timed, n, (e) => e.answerer, () => 1);
+  const talk = totals(timed, n, (e) => e.answerer, (e) => e.ms);
+  const deep = totals(log, n, (e) => e.answerer, (e) => (CARDS.get(e.cardId)?.level === 3 ? 1 : 0));
+  const avg = (i: number) => talk[i] / timedCount[i];
+
+  const candidates: Candidate[] = [
+    {
+      icon: '🌊', title: 'Ныряльщик',
+      score: (i) => (deep[i] > 0 ? deep[i] : null),
+      detail: (i) => `${deep[i]} ${plural(deep[i], 'ответ', 'ответа', 'ответов')} на уровне «Глубина»`,
+    },
+    {
+      icon: '📖', title: 'Открытая книга',
+      score: (i) => (answered[i] > 0 && rerolls[i] === 0 ? answered[i] : null),
+      detail: () => 'ни разу не попросил(а) другую карточку',
+    },
+    {
+      icon: '✂️', title: 'Мастер краткости',
+      score: (i) => (timedCount[i] > 0 ? -avg(i) : null),
+      detail: (i) => `в среднем ${formatDuration(avg(i))} на ответ — коротко и по делу`,
+    },
+    {
+      icon: '🎤', title: 'Главный по вопросам',
+      score: (i) => (asked[i] > 0 ? asked[i] : null),
+      detail: (i) => `${asked[i]} ${plural(asked[i], 'вопрос задан', 'вопроса задано', 'вопросов задано')}`,
+    },
+    {
+      icon: '👂', title: 'Лучший слушатель',
+      score: (i) => -talk[i],
+      detail: () => 'дал(а) выговориться другим',
+    },
+  ];
+
+  const out: Award[] = [];
+  const award = (i: number, c: Omit<Candidate, 'score'>) => {
+    out.push({ player: i, icon: c.icon, title: c.title, name: players[i], detail: c.detail(i) });
+    credited.add(i);
+  };
+  for (const c of candidates) {
+    if (titles.has(c.title)) continue;
+    const open = players.map((_, i) => i).filter((i) => !credited.has(i) && c.score(i) !== null);
+    if (open.length === 0) continue;
+    award(best(open, (i) => c.score(i)!)!, c);
+  }
+  let g = 0;
+  for (let i = 0; i < n; i++) if (!credited.has(i)) award(i, GENERIC[g++ % GENERIC.length]);
+  return out;
 }

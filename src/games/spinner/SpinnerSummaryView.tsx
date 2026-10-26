@@ -41,8 +41,8 @@ export function SpinnerSummaryView({ state, onMenu, onNewGame }: Props) {
 
         {s.awards.length > 0 && (
           <ul className="summary__awards" aria-label="Номинации">
-            {s.awards.map((a) => (
-              <li key={a.title} className="summary__award">
+            {s.awards.map((a, i) => (
+              <li key={i} className="summary__award">
                 <span className="summary__award-icon" aria-hidden="true">{a.icon}</span>
                 <div>
                   <p className="summary__award-title">{a.title}</p>
