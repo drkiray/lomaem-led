@@ -50,7 +50,7 @@ export function SpinnerSetupScreen() {
 
   return (
     <Screen title="Крутилочка" onBack={back}>
-      <p className="muted">Впишите всех, кто играет. Первый крутит случайный игрок, а дальше спрашивает тот, кто только что отвечал.</p>
+      <p className="muted">Впишите всех, кто играет. Первый крутит случайный игрок, а дальше спрашивает тот, кто только что отвечал. Телефон можно не передавать — положите его в центр стола.</p>
       {birthday && (
         <div className="players__row players__row--birthday">
           <span className="players__num" aria-hidden="true">🎂</span>
