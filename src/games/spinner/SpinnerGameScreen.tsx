@@ -186,7 +186,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         title={isBirthdayCard ? 'Вопрос про именинника' : card?.kind === 'action' ? 'Действие' : 'Вопрос'}
         festive={isBirthdayCard}
         className="modal--card"
-        hideTitle={!isBirthdayCard && card?.kind !== 'action'}
+        hideTitle={!isBirthdayCard}
         actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone', at: Date.now() })}>Готово</Button>}
         below={
           <button type="button" className="spin-card__reroll" onClick={reroll}>

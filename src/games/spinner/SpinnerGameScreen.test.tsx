@@ -32,6 +32,7 @@ test('card addresses the answerer by name; Готово passes the turn', async 
   renderWithProviders(<SpinnerGameScreen />);
   const dialog = screen.getByRole('dialog', { name: 'Действие' });
   expect(dialog.querySelector('.spin-card__name')).toHaveTextContent('Петя');
+  expect(screen.queryByRole('heading', { name: 'Действие' })).toBeNull(); // no visible title
   expect(dialog).toHaveTextContent('Петя, я жду от тебя искренний комплимент');
   await userEvent.click(screen.getByRole('button', { name: 'Готово' }));
   expect(document.querySelector('.spinner-game__turn')).toHaveTextContent(/^Петя, .+!$/);
