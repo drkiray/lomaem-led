@@ -9,9 +9,11 @@ interface Props {
   festive?: boolean;
   /** keep the title for screen readers only */
   hideTitle?: boolean;
+  /** shown under the dialog at the bottom of the screen, outside the card */
+  below?: ReactNode;
 }
 
-export function Modal({ open, title, children, actions, festive, hideTitle }: Props) {
+export function Modal({ open, title, children, actions, festive, hideTitle, below }: Props) {
   if (!open) return null;
   // Portalled to <body>: inside the screen, the entry animation's transform
   // would become the fixed backdrop's containing block and the dialog would
@@ -23,6 +25,7 @@ export function Modal({ open, title, children, actions, festive, hideTitle }: Pr
         {children && <div className="modal__body">{children}</div>}
         <div className="modal__actions">{actions}</div>
       </div>
+      {below && <div className="modal-below">{below}</div>}
     </div>,
     document.body,
   );

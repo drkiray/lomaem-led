@@ -57,7 +57,7 @@
 .spin-card__text { margin: 0; font-size: 22px; line-height: 1.35; font-weight: 700; text-align: center; animation: fade-in 0.3s ease-out; }
 /* Barely visible way out of an uncomfortable card. */
 .spin-card__reroll {
-  display: flex; align-items: center; gap: 6px; margin: 14px auto 0; padding: 6px 10px;
+  display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px;
   border: 0; background: none; color: var(--muted); opacity: 0.45; font-size: 13px;
 }
 .spin-card__reroll:active { opacity: 0.8; }

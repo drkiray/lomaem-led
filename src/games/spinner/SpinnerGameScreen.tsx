@@ -174,14 +174,16 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         festive={isBirthdayCard}
         hideTitle={!isBirthdayCard && card?.kind !== 'action'}
         actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone', at: Date.now() })}>Готово</Button>}
+        below={
+          <button type="button" className="spin-card__reroll" onClick={reroll}>
+            <span className="spin-card__reroll-icon" aria-hidden="true">↻</span>
+            поменять карточку
+          </button>
+        }
       >
         {isBirthdayCard && <div className="spin-card__gift" aria-hidden="true">🎁</div>}
         <p className="spin-card__names"><b>{asker}</b> → <b>{answerer}</b></p>
         <p className="spin-card__text" key={card?.id}>{card ? fillTemplate(card.text, asker, answerer, birthdayName) : ''}</p>
-        <button type="button" className="spin-card__reroll" onClick={reroll}>
-          <span className="spin-card__reroll-icon" aria-hidden="true">↻</span>
-          поменять карточку
-        </button>
       </Modal>
 
       <Modal
