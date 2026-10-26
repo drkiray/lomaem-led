@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { useNav } from '../app/nav';
 import { GAMES } from './games';
 import { ResumeBanner } from './ResumeBanner';
+import { UpdateButton } from './UpdateButton';
 
 export function MenuScreen() {
   const { navigate } = useNav();
@@ -47,6 +48,7 @@ export function MenuScreen() {
         игру сделал вот этот{' '}
         <a href="https://t.me/kirayslifes" target="_blank" rel="noopener noreferrer">крендель</a>
       </p>
+      <UpdateButton />
     </div>
   );
 }

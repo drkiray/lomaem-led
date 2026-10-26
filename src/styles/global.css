@@ -197,6 +197,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .menu { display: flex; flex-direction: column; gap: 20px; min-height: calc(var(--app-h) - var(--pad-top) - var(--pad-bottom)); }
 .menu__credit { margin: auto 0 0; padding-top: 8px; text-align: center; color: var(--muted); font-size: 13px; opacity: 0.7; }
 .menu__credit a { color: var(--ice); font-weight: 700; text-decoration: none; text-shadow: var(--ice-glow); border-bottom: 1px dashed currentColor; }
+/* «Проверить обновления»: quiet, at the very bottom of the menu */
+.update { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: -8px; }
+.update__btn {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border: 0; background: none;
+  color: var(--muted); font-size: 13px; opacity: 0.8;
+}
+.update__btn:disabled { cursor: default; }
+.update__icon { font-size: 16px; line-height: 1; }
+.update__icon.is-spinning { animation: update-spin 0.9s linear infinite; }
+.update__version { color: var(--muted); font-size: 11px; opacity: 0.55; }
+@keyframes update-spin { to { transform: rotate(360deg); } }
 .menu__header { display: flex; justify-content: flex-end; }
 .logo {
   margin: 8px 0 0; text-align: center;
