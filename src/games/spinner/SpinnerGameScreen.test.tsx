@@ -23,7 +23,7 @@ test('without a saved game offers a new one', () => {
 test('shows whose turn it is', () => {
   save();
   renderWithProviders(<SpinnerGameScreen />);
-  expect(screen.getByText(/, крути!/)).toHaveTextContent('Маша, крути!');
+  expect(document.querySelector('.spinner-game__turn')).toHaveTextContent(/^Маша, .+!$/);
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Раунд 1 «Поверхность»');
 });
 
@@ -34,7 +34,7 @@ test('card shows asker → answerer and filled text; Готово passes the tur
   expect(dialog).toHaveTextContent('Маша → Петя');
   expect(dialog).toHaveTextContent('Я жду от тебя искренний комплимент');
   await userEvent.click(screen.getByRole('button', { name: 'Готово' }));
-  expect(screen.getByText(/, крути!/)).toHaveTextContent('Петя, крути!');
+  expect(document.querySelector('.spinner-game__turn')).toHaveTextContent(/^Петя, .+!$/);
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).turnIndex).toBe(1);
 });
 

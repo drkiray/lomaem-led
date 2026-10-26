@@ -2,6 +2,7 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { useNav } from '../../app/nav';
 import { useFeedback } from '../../audio/useFeedback';
 import { BIRTHDAY_CARDS } from '../../content/birthdayCards';
+import { pickSpinPhrase } from '../../content/spinPhrases';
 import { SPINNER_CARDS } from '../../content/spinnerCards';
 import { KEYS, loadJSON, removeKey, saveJSON } from '../../lib/storage';
 import { useLandscape } from '../../lib/useLandscape';
@@ -56,6 +57,16 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
   useEffect(() => {
     setRotation(initial.rotation);
   }, [initial.rotation, setRotation]);
+
+  // a fresh call to action for every turn
+  const [phrase, setPhrase] = useState(() => pickSpinPhrase(null));
+  const turnKey = `${state.level}:${state.turnIndex}:${state.turns.map((t) => t.asker).join()}`;
+  const lastTurnKey = useRef(turnKey);
+  useEffect(() => {
+    if (lastTurnKey.current === turnKey) return;
+    lastTurnKey.current = turnKey;
+    setPhrase((prev) => pickSpinPhrase(prev));
+  }, [turnKey]);
 
   const turn = currentTurn(state);
   const asker = state.players[turn.asker];
@@ -157,7 +168,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
       </header>
 
       <p className="spinner-game__turn">
-        <b>{asker}</b>, крути!
+        <b>{asker}</b>, {phrase}
       </p>
 
       <Wheel
