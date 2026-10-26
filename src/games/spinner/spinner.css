@@ -109,3 +109,36 @@
 .spin-card__gift { font-size: 52px; line-height: 1; text-align: center; animation: gift-bounce 1.6s ease-in-out infinite; }
 @keyframes gift-bounce { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(4deg); } }
 @media (prefers-reduced-motion: reduce) { .spin-card__gift { animation: none; } }
+
+/* End-of-game summary */
+.summary { display: flex; flex-direction: column; gap: 16px; }
+.summary__hero { text-align: center; animation: pop-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.summary__hero-icon { font-size: 56px; line-height: 1; }
+.summary__hero-title { margin: 8px 0 4px; font-family: var(--font-display); font-size: 24px; font-weight: 600; color: #ffd98f; }
+.summary__hero .muted { margin: 0; }
+.summary__stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.summary__stat {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 8px; text-align: center;
+  border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border);
+}
+.summary__stat b { font-size: 26px; color: var(--ice); line-height: 1.1; }
+.summary__stat span { font-size: 13px; color: var(--muted); }
+.summary__awards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.summary__award {
+  display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
+  border-radius: var(--radius); border: 1px solid rgba(255, 200, 107, 0.45);
+  background: linear-gradient(135deg, rgba(255, 200, 107, 0.12), rgba(255, 120, 170, 0.08));
+  animation: pop-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+.summary__award:nth-child(2) { animation-delay: 0.08s; }
+.summary__award:nth-child(3) { animation-delay: 0.16s; }
+.summary__award:nth-child(4) { animation-delay: 0.24s; }
+.summary__award:nth-child(n + 5) { animation-delay: 0.32s; }
+.summary__award p { margin: 0; }
+.summary__award-icon { font-size: 30px; line-height: 1; flex: none; }
+.summary__award-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #ffd98f; }
+.summary__award-name { font-size: 20px; font-weight: 700; }
+.summary__quote { margin-top: 6px !important; font-style: italic; color: var(--text); opacity: 0.85; }
+.summary__actions { display: flex; gap: 10px; }
+.summary__actions > * { flex: 1; }
+@media (prefers-reduced-motion: reduce) { .summary__hero, .summary__award { animation: none; } }

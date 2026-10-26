@@ -3,6 +3,7 @@ import type { Rng } from '../../lib/random';
 
 export type Level = 1 | 2 | 3;
 export const LEVELS: Level[] = [1, 2, 3];
+export const LEVEL_TITLES: Record<Level, string> = { 1: 'Поверхность', 2: 'Погружение', 3: 'Глубина' };
 export type CardKind = 'question' | 'action';
 
 export interface Card {

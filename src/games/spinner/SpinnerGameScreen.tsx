@@ -11,16 +11,16 @@ import { Button } from '../../ui/Button';
 import { FullscreenButton, LandscapePrompt } from '../../ui/LandscapePrompt';
 import { Modal } from '../../ui/Modal';
 import { Screen } from '../../ui/Screen';
-import { LEVELS, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
+import { LEVELS, LEVEL_TITLES, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
 import { computeStopRotation, normalizeDeg } from './geometry';
 import { currentTurn, restoreSpinnerGame, spinnerReducer, type SpinnerState } from './state';
 import { buildRoundTurns } from './turns';
+import { SpinnerSummaryView } from './SpinnerSummaryView';
 import { useSpin } from './useSpin';
 import { Wheel } from './Wheel';
 import './spinner.css';
 
 const ALL_CARDS = [...SPINNER_CARDS, ...BIRTHDAY_CARDS];
-const LEVEL_TITLES: Record<Level, string> = { 1: 'Поверхность', 2: 'Погружение', 3: 'Глубина' };
 
 export function SpinnerGameScreen() {
   const { navigate, back } = useNav();
@@ -37,7 +37,7 @@ export function SpinnerGameScreen() {
 }
 
 function SpinnerGame({ initial }: { initial: SpinnerState }) {
-  const { back } = useNav();
+  const { back, navigate } = useNav();
   const { settings } = useSettings();
   const fx = useFeedback();
   const [state, dispatch] = useReducer(spinnerReducer, initial);
@@ -84,7 +84,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
     saveJSON(KEYS.spinnerSeen, [...seen, next.id]);
     fx.sfx('card');
     fx.vibrate(60);
-    dispatch({ type: 'spinDone' });
+    dispatch({ type: 'spinDone', at: Date.now() });
     busy.current = false;
   };
 
@@ -112,10 +112,30 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
       turns: buildRoundTurns(state.players.length, Math.random, state.phase === 'roundEnd' ? turn.answerer : turn.asker),
     });
 
-  const finish = () => {
+  const leave = () => {
     removeKey(KEYS.spinnerGame);
     back();
   };
+
+  // With anything played, the game ends on the summary; an empty game just closes.
+  const finish = () => {
+    setConfirmExit(false);
+    if (state.log.length === 0) leave();
+    else dispatch({ type: 'finish', at: Date.now() });
+  };
+
+  if (state.phase === 'summary') {
+    return (
+      <SpinnerSummaryView
+        state={state}
+        onMenu={leave}
+        onNewGame={() => {
+          removeKey(KEYS.spinnerGame);
+          navigate('spinner-setup', { replace: true });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="spinner-game">
@@ -161,7 +181,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         open={state.phase === 'card' && card !== null}
         title={isBirthdayCard ? 'Вопрос про именинника' : card?.kind === 'action' ? 'Действие' : 'Вопрос'}
         festive={isBirthdayCard}
-        actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone' })}>Готово</Button>}
+        actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone', at: Date.now() })}>Готово</Button>}
       >
         {isBirthdayCard && <div className="spin-card__gift" aria-hidden="true">🎁</div>}
         <p className="spin-card__names"><b>{asker}</b> → <b>{answerer}</b></p>
@@ -218,7 +238,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
           </>
         }
       >
-        <p>Прогресс этой партии будет удалён.</p>
+        <p>{state.log.length > 0 ? 'Покажем итоги вечера.' : 'Партия ещё не началась — просто выйдем в меню.'}</p>
       </Modal>
       <LandscapePrompt landscape={landscape} />
     </div>

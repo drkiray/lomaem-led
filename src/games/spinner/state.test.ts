@@ -76,3 +76,39 @@ test('birthday plan is kept by spin and restored; bad or missing plan becomes nu
   expect(restoreSpinnerGame(old)?.birthday).toBeNull();
   expect(restoreSpinnerGame({ ...g, birthday: { index: 9, since: 0, every: 2 } })?.birthday).toBeNull();
 });
+
+test('cards are logged with time on screen and rerolls; finish ends on the summary', () => {
+  let s = createSpinnerGame(['Аня', 'Боря', 'Вика'], config, turns, null, 1000);
+  s = spinnerReducer(s, { type: 'spin', rotation: 10, cardId: 'l1-q1', usedIds: ['l1-q1'] });
+  s = spinnerReducer(s, { type: 'spinDone', at: 2000 });
+  s = spinnerReducer(s, { type: 'reroll', cardId: 'l1-q2', usedIds: ['l1-q1', 'l1-q2'] });
+  s = spinnerReducer(s, { type: 'cardDone', at: 62000 });
+  expect(s.log).toEqual([{ asker: 1, answerer: 0, cardId: 'l1-q2', ms: 60000, rerolls: 1 }]);
+  expect(s.cardRerolls).toBe(0);
+  s = spinnerReducer(s, { type: 'finish', at: 90000 });
+  expect(s).toMatchObject({ phase: 'summary', finishedAt: 90000 });
+});
+
+test('a phone left on the table does not count hours', () => {
+  let s = spinnerReducer(fresh(), { type: 'spin', rotation: 10, cardId: 'l1-q1', usedIds: ['l1-q1'] });
+  s = spinnerReducer(s, { type: 'spinDone', at: 0 });
+  s = spinnerReducer(s, { type: 'cardDone', at: 5 * 60 * 60 * 1000 });
+  expect(s.log[0].ms).toBe(15 * 60 * 1000);
+});
+
+test('a finished round is counted', () => {
+  let s = fresh();
+  for (let i = 0; i < 3; i++) {
+    s = spinnerReducer(s, { type: 'spin', rotation: 10, cardId: 'l1-q1', usedIds: [] });
+    s = spinnerReducer(s, { type: 'spinDone' });
+    s = spinnerReducer(s, { type: 'cardDone' });
+  }
+  expect(s).toMatchObject({ phase: 'roundEnd', roundsDone: 1 });
+});
+
+test('old saves without the log restore with an empty one', () => {
+  const old = JSON.parse(JSON.stringify(fresh()));
+  delete old.log;
+  delete old.startedAt;
+  expect(restoreSpinnerGame(old)).toMatchObject({ log: [], roundsDone: 0, cardRerolls: 0 });
+});

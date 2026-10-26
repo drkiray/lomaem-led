@@ -143,3 +143,26 @@ test('birthday card is festive, names the birthday person and keeps its kind on 
   await userEvent.click(screen.getByRole('button', { name: /не хочу отвечать/ }));
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).cardId).toMatch(/^b1-q/);
 });
+
+test('ending a played game shows the summary; «В меню» clears it', async () => {
+  save({ log: [{ asker: 0, answerer: 1, cardId: 'l1-q1', ms: 120000, rerolls: 0 }, { asker: 1, answerer: 0, cardId: 'l1-q2', ms: 30000, rerolls: 1 }] });
+  const { back } = renderWithProviders(<SpinnerGameScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить' }));
+  expect(screen.getByRole('dialog', { name: 'Завершить игру?' })).toHaveTextContent('Покажем итоги');
+  await userEvent.click(screen.getByRole('button', { name: 'Завершить игру' }));
+  expect(screen.getByRole('heading', { name: 'Итоги вечера' })).toBeInTheDocument();
+  expect(screen.getByText('Душа разговора')).toBeInTheDocument();
+  expect(screen.getByText('Загадка вечера')).toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).phase).toBe('summary'); // survives a reload
+  await userEvent.click(screen.getByRole('button', { name: 'В меню' }));
+  expect(localStorage.getItem('ll.spinner.game')).toBeNull();
+  expect(back).toHaveBeenCalled();
+});
+
+test('«Новая игра» from the summary opens setup', async () => {
+  save({ phase: 'summary', log: [{ asker: 0, answerer: 1, cardId: 'l1-q1', ms: 1000, rerolls: 0 }] });
+  const { navigate } = renderWithProviders(<SpinnerGameScreen />);
+  await userEvent.click(screen.getByRole('button', { name: 'Новая игра' }));
+  expect(navigate).toHaveBeenCalledWith('spinner-setup', { replace: true });
+  expect(localStorage.getItem('ll.spinner.game')).toBeNull();
+});
