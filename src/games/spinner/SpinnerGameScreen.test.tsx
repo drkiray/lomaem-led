@@ -27,12 +27,12 @@ test('shows whose turn it is', () => {
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Раунд 1 «Поверхность»');
 });
 
-test('card shows asker → answerer and filled text; Готово passes the turn', async () => {
+test('card addresses the answerer by name; Готово passes the turn', async () => {
   save({ phase: 'card', cardId: 'l1-a1' });
   renderWithProviders(<SpinnerGameScreen />);
   const dialog = screen.getByRole('dialog', { name: 'Действие' });
-  expect(dialog).toHaveTextContent('Маша → Петя');
-  expect(dialog).toHaveTextContent('Я жду от тебя искренний комплимент');
+  expect(dialog.querySelector('.spin-card__name')).toHaveTextContent('Петя');
+  expect(dialog).toHaveTextContent('Петя, я жду от тебя искренний комплимент');
   await userEvent.click(screen.getByRole('button', { name: 'Готово' }));
   expect(document.querySelector('.spinner-game__turn')).toHaveTextContent(/^Петя, .+!$/);
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).turnIndex).toBe(1);
@@ -153,7 +153,7 @@ test('birthday card is festive, names the birthday person and keeps its kind on 
   const dialog = screen.getByRole('dialog', { name: 'Вопрос про именинника' });
   expect(dialog).toHaveClass('modal--festive');
   expect(dialog).toHaveTextContent('🎁');
-  expect(dialog).toHaveTextContent('Аня → Петя');
+  expect(dialog.querySelector('.spin-card__name')).toHaveTextContent('Петя');
   expect(dialog).toHaveTextContent('Денис');
   await userEvent.click(screen.getByRole('button', { name: /поменять карточку/ }));
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).cardId).toMatch(/^b1-q/);

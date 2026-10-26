@@ -78,3 +78,9 @@ export function planBirthdayCard(
   }
   return { useBirthday: false, plan: { ...plan, since: plan.since + 1 } };
 }
+
+// The card is read to the answerer by name: «Илья, куда ты мечтаешь съездить…».
+// Returns the text to follow «Name, » — its first letter lowered.
+export function afterAddress(text: string): string {
+  return text.charAt(0).toLocaleLowerCase('ru') + text.slice(1);
+}

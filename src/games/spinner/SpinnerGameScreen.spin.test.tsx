@@ -25,7 +25,7 @@ test('tapping the hub spins once, lands on the planned answerer and records the 
   await userEvent.dblClick(hub);
 
   const dialog = await screen.findByRole('dialog', { name: 'Вопрос' });
-  expect(dialog).toHaveTextContent('Оля → Маша');
+  expect(dialog.querySelector('.spin-card__name')).toHaveTextContent('Маша');
   expect(spinTo).toHaveBeenCalledTimes(1);
   expect(spinTo.mock.calls[0][1]).toBe(4000);
   const seen = JSON.parse(localStorage.getItem('ll.spinner.seen')!);

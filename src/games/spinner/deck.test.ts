@@ -1,5 +1,5 @@
 import { mulberry32 } from '../../lib/random';
-import { createBirthdayPlan, fillTemplate, pickCard, planBirthdayCard, type Card } from './deck';
+import { afterAddress, createBirthdayPlan, fillTemplate, pickCard, planBirthdayCard, type Card } from './deck';
 
 const CARDS: Card[] = [
   { id: 'q1', level: 1, kind: 'question', text: 'Q1?' },
@@ -87,4 +87,9 @@ test('birthday plan: a birthday card every 2nd or 3rd fitting turn, never about 
 
 test('fillTemplate fills {birthday}', () => {
   expect(fillTemplate('{asker}, про {birthday}', 'А', 'Б', 'Д')).toBe('А, про Д');
+});
+
+test('afterAddress lowers the first letter so the card follows «Name, »', () => {
+  expect(afterAddress('Куда ты мечтаешь съездить?')).toBe('куда ты мечтаешь съездить?');
+  expect(afterAddress('Я жду комплимент')).toBe('я жду комплимент');
 });

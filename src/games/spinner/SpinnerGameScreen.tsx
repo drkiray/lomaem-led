@@ -12,7 +12,7 @@ import { Button } from '../../ui/Button';
 import { FullscreenButton, LandscapePrompt } from '../../ui/LandscapePrompt';
 import { Modal } from '../../ui/Modal';
 import { Screen } from '../../ui/Screen';
-import { LEVEL_TITLES, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
+import { LEVEL_TITLES, afterAddress, fillTemplate, pickCard, planBirthdayCard, type Level } from './deck';
 import { computeStopRotation, normalizeDeg } from './geometry';
 import { currentTurn, restoreSpinnerGame, spinnerReducer, type SpinnerState } from './state';
 import { buildRoundTurns } from './turns';
@@ -183,6 +183,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         open={state.phase === 'card' && card !== null}
         title={isBirthdayCard ? 'Вопрос про именинника' : card?.kind === 'action' ? 'Действие' : 'Вопрос'}
         festive={isBirthdayCard}
+        className="modal--card"
         hideTitle={!isBirthdayCard && card?.kind !== 'action'}
         actions={<Button size="lg" onClick={() => dispatch({ type: 'cardDone', at: Date.now() })}>Готово</Button>}
         below={
@@ -193,8 +194,9 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         }
       >
         {isBirthdayCard && <div className="spin-card__gift" aria-hidden="true">🎁</div>}
-        <p className="spin-card__names"><b>{asker}</b> → <b>{answerer}</b></p>
-        <p className="spin-card__text" key={card?.id}>{card ? fillTemplate(card.text, asker, answerer, birthdayName) : ''}</p>
+        <p className="spin-card__text" key={card?.id}>
+          <span className="spin-card__name">{answerer}</span>, {card ? afterAddress(fillTemplate(card.text, asker, answerer, birthdayName)) : ''}
+        </p>
       </Modal>
 
       <Modal

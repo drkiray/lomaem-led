@@ -52,9 +52,11 @@
 .icon-btn__svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .spinner-game__turn { margin: 0; text-align: center; font-size: 22px; font-family: var(--font-display); font-weight: 600; }
 .spinner-game__turn b { color: var(--ice); text-shadow: var(--ice-glow); }
-.spin-card__names { margin: 0; font-size: 18px; text-align: center; }
-.spin-card__names b { color: var(--ice); }
-.spin-card__text { margin: 0; font-size: 22px; line-height: 1.35; font-weight: 700; text-align: center; animation: fade-in 0.3s ease-out; }
+.spin-card__text { margin: 0; font-size: 26px; line-height: 1.35; font-weight: 700; text-align: center; animation: fade-in 0.3s ease-out; }
+.spin-card__name { color: var(--ice); text-shadow: var(--ice-glow); }
+/* The card itself: big, in the middle of the screen */
+.modal--card { max-width: 560px; min-height: min(420px, calc(var(--app-h) - 120px)); padding: 28px 24px 24px; justify-content: space-between; }
+.modal--card .modal__body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
 /* Barely visible way out of an uncomfortable card. */
 .spin-card__reroll {
   display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px;
@@ -102,7 +104,6 @@
   box-shadow: 0 0 44px rgba(255, 200, 107, 0.35);
 }
 .modal--festive .modal__title { color: #ffd98f; text-align: center; }
-.modal--festive .spin-card__names b { color: #ffd98f; }
 .spin-card__gift { font-size: 52px; line-height: 1; text-align: center; animation: gift-bounce 1.6s ease-in-out infinite; }
 @keyframes gift-bounce { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(4deg); } }
 @media (prefers-reduced-motion: reduce) { .spin-card__gift { animation: none; } }

@@ -166,8 +166,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   display: flex; justify-content: center; animation: fade-in 0.3s ease-out;
 }
 /* keep the bottom strip free so a tall card never covers the control */
-.modal-backdrop:has(.modal-below) { padding-bottom: 52px; }
-.modal-backdrop:has(.modal-below) .modal { max-height: calc(var(--app-h) - 72px); overflow-y: auto; }
+.modal-backdrop:has(.modal-below) { padding-block: 52px; } /* symmetric: the card stays centred */
+.modal-backdrop:has(.modal-below) .modal { max-height: calc(var(--app-h) - 104px); overflow-y: auto; }
 .modal__title { margin: 0; font-family: var(--font-display); font-size: 20px; font-weight: 600; }
 .modal__body { color: var(--text); min-height: 0; overflow-y: auto; overflow-wrap: anywhere; }
 /* Never wider or taller than the screen: long links wrap, a long body scrolls inside the card
