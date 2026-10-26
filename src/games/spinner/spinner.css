@@ -60,7 +60,10 @@
 /* never a scrollbar on the card: the text shrinks to fit instead (useFitCard),
    and the gift's bounce may poke out of the body without being clipped */
 .modal-backdrop .modal.modal--card, .modal--card .modal__body { overflow: visible; max-height: none; }
-.modal--card .spin-card__text { font-size: clamp(18px, calc(var(--app-h) * 0.055), 26px); }
+.modal--card .spin-card__text { font-size: clamp(18px, calc(var(--app-h) * 0.055), 26px); padding: 24px 8px; }
+/* «Готово»: a compact button in the middle, not a full-width bar */
+.modal--card .modal__actions { justify-content: center; }
+.modal--card .modal__actions > .btn { flex: 0 0 auto; width: auto; min-width: 180px; padding-inline: 44px; }
 /* Barely visible way out of an uncomfortable card. */
 .spin-card__reroll {
   display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px;
@@ -116,7 +119,8 @@
    question keeps a readable size. */
 @media (orientation: landscape) and (max-height: 500px) {
   .modal-backdrop:has(.modal--card) { padding-block: 40px; }
-  .modal-backdrop .modal.modal--card { min-height: 0; padding: 14px 20px; gap: 10px; }
+  .modal-backdrop .modal.modal--card { min-height: 0; max-width: min(760px, 100%); padding: 16px 28px; gap: 10px; }
+  .modal--card .spin-card__text { padding: 14px 16px; }
   .modal--card .modal__title { font-size: 16px; }
   .modal--card .modal__body { gap: 6px; }
   .modal--card .spin-card__gift { font-size: 28px; padding-top: 4px; }
