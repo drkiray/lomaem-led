@@ -92,8 +92,7 @@
 }
 
 /* Birthday mode: highlighted name field in setup, festive card in the game */
-.players__row--birthday { margin-bottom: 4px; }
-.players__row--birthday .players__num { font-size: 20px; }
+.players__row--leading .players__num { font-size: 20px; }
 .input--birthday {
   border-color: #ffc86b; background: linear-gradient(135deg, rgba(255, 200, 107, 0.16), rgba(255, 120, 170, 0.12));
   box-shadow: 0 0 14px rgba(255, 200, 107, 0.3);

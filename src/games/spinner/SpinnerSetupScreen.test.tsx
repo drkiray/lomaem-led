@@ -60,6 +60,11 @@ test('«Как в прошлый раз» restores the birthday person and count
   renderWithProviders(<SpinnerSetupScreen />);
   await userEvent.click(screen.getByRole('button', { name: 'Как в прошлый раз (3)' }));
   expect(screen.getByLabelText('Имя именинника')).toHaveValue('Денис');
+  // row «0»: inside the list, under «Как в прошлый раз» and above player 1
+  const bday = screen.getByLabelText('Имя именинника');
+  expect(screen.getByRole('button', { name: /Как в прошлый раз/ }).compareDocumentPosition(bday) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(bday.compareDocumentPosition(screen.getByLabelText('Имя игрока 1')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(bday.closest('ol')).toBe(screen.getByLabelText('Имя игрока 1').closest('ol'));
   expect(screen.getByLabelText('Имя игрока 1')).toHaveValue('Маша');
   expect(screen.getByText('Игроков: 3')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Начать' }));

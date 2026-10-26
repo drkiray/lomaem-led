@@ -51,26 +51,26 @@ export function SpinnerSetupScreen() {
   return (
     <Screen title="Крутилочка" onBack={back}>
       <p className="muted">Впишите всех, кто играет. Первый крутит случайный игрок, а дальше спрашивает тот, кто только что отвечал. Телефон можно не передавать — положите его в центр стола.</p>
-      {birthday && (
-        <div className="players__row players__row--birthday">
-          <span className="players__num" aria-hidden="true">🎂</span>
-          <input
-            className="input input--birthday"
-            value={birthdayName}
-            placeholder="Имя именинника"
-            aria-label="Имя именинника"
-            maxLength={20}
-            autoCapitalize="words"
-            enterKeyHint="next"
-            onChange={(e) => setBirthdayName(e.target.value)}
-          />
-        </div>
-      )}
       <PlayerListInput
         players={players}
         onChange={setPlayers}
         extra={birthday && birthdayClean ? 1 : 0}
         lastExtra={lastBirthday ? 1 : 0}
+        leading={birthday && (
+          <>
+            <span className="players__num" aria-hidden="true">🎂</span>
+            <input
+              className="input input--birthday"
+              value={birthdayName}
+              placeholder="Имя именинника"
+              aria-label="Имя именинника"
+              maxLength={20}
+              autoCapitalize="words"
+              enterKeyHint="next"
+              onChange={(e) => setBirthdayName(e.target.value)}
+            />
+          </>
+        )}
         onRestoreLast={() => {
           setBirthday(lastBirthday !== '');
           setBirthdayName(lastBirthday);

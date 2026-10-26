@@ -80,7 +80,6 @@ export function SpinnerSummaryView({ state, onMenu, onNewGame }: Props) {
 
         <div className={`summary__more ${more ? 'is-visible' : ''}`} aria-hidden="true">
           <span className="summary__more-chevron">⌄</span>
-          листай вниз
         </div>
 
         <div className="summary__actions">

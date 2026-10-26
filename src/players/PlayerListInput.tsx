@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Button } from '../ui/Button';
 import { cleanPlayers, loadLastPlayers } from './players';
 
@@ -10,9 +10,11 @@ interface Props {
   /** extras restored by «Как в прошлый раз» */
   lastExtra?: number;
   onRestoreLast?: () => void;
+  /** a special row above player 1 (the birthday person) */
+  leading?: ReactNode;
 }
 
-export function PlayerListInput({ players, onChange, extra = 0, lastExtra = 0, onRestoreLast }: Props) {
+export function PlayerListInput({ players, onChange, extra = 0, lastExtra = 0, onRestoreLast, leading }: Props) {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const last = useMemo(loadLastPlayers, []);
@@ -41,6 +43,7 @@ export function PlayerListInput({ players, onChange, extra = 0, lastExtra = 0, o
         </Button>
       )}
       <ol className="players__list">
+        {leading && <li className="players__row players__row--leading">{leading}</li>}
         {players.map((name, i) => (
           <li key={i} className="players__row">
             <span className="players__num">{i + 1}</span>
