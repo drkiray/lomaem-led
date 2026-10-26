@@ -162,7 +162,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
       </header>
 
       <p className="spinner-game__turn">
-        Крутит: <b>{asker}</b>
+        <b>{asker}</b>, крути!
       </p>
 
       <Wheel
