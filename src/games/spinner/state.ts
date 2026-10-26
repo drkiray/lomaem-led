@@ -10,7 +10,7 @@ export interface LogEntry {
   answerer: number;
   cardId: string;
   ms: number; // card on screen until «Готово» (capped: a phone left on the table)
-  rerolls: number; // «не хочу отвечать» presses on this turn
+  rerolls: number; // «поменять карточку» presses on this turn
 }
 
 export const MAX_ANSWER_MS = 15 * 60 * 1000;

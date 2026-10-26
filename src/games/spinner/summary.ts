@@ -102,7 +102,7 @@ export function summarize(state: SpinnerState): SpinnerSummary {
     give(opener, '🔑', 'Умеет разговорить', `в среднем ${formatDuration(askedTime[opener] / askedCount[opener])} на ответ`);
   }
 
-  // «не хочу отвечать» champion — only when it happened at all
+  // «поменять карточку» champion — only when it happened at all
   const rerolls = totals(log, n, (e) => e.answerer, (e) => e.rerolls);
   const shy = best(free().filter((i) => rerolls[i] > 0), (i) => rerolls[i]);
   if (shy !== null) give(shy, '🙈', 'Загадка вечера', `${times(rerolls[shy])} просил(а) другую карточку`);

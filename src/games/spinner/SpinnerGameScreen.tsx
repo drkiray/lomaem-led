@@ -88,7 +88,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
     busy.current = false;
   };
 
-  // «не хочу отвечать»: another card of the same level and kind instead
+  // «поменять карточку»: another card of the same level and kind instead
   const reroll = () => {
     if (state.phase !== 'card' || !card) return;
     const seen = loadJSON<string[]>(KEYS.spinnerSeen, []);
@@ -184,7 +184,7 @@ function SpinnerGame({ initial }: { initial: SpinnerState }) {
         <p className="spin-card__text" key={card?.id}>{card ? fillTemplate(card.text, asker, answerer, birthdayName) : ''}</p>
         <button type="button" className="spin-card__reroll" onClick={reroll}>
           <span className="spin-card__reroll-icon" aria-hidden="true">↻</span>
-          {card?.kind === 'action' ? 'не хочу делать' : 'не хочу отвечать'}
+          поменять карточку
         </button>
       </Modal>
 

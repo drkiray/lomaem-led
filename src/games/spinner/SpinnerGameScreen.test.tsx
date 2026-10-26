@@ -106,12 +106,12 @@ test('no landscape prompt when turned off in settings', () => {
   unstubFullscreen();
 });
 
-test('«не хочу отвечать» replaces the question with another question', async () => {
+test('«поменять карточку» replaces the question with another question', async () => {
   save({ phase: 'card', cardId: 'l1-q1', usedIds: ['l1-q1'] });
   renderWithProviders(<SpinnerGameScreen />);
   const dialog = screen.getByRole('dialog', { name: 'Вопрос' });
   const before = dialog.querySelector('.spin-card__text')!.textContent;
-  await userEvent.click(screen.getByRole('button', { name: /не хочу отвечать/ }));
+  await userEvent.click(screen.getByRole('button', { name: /поменять карточку/ }));
   expect(screen.getByRole('dialog', { name: 'Вопрос' }).querySelector('.spin-card__text')!.textContent).not.toBe(before);
   const game = JSON.parse(localStorage.getItem('ll.spinner.game')!);
   expect(game.cardId).not.toBe('l1-q1');
@@ -140,7 +140,7 @@ test('birthday card is festive, names the birthday person and keeps its kind on 
   expect(dialog).toHaveTextContent('🎁');
   expect(dialog).toHaveTextContent('Аня → Петя');
   expect(dialog).toHaveTextContent('Денис');
-  await userEvent.click(screen.getByRole('button', { name: /не хочу отвечать/ }));
+  await userEvent.click(screen.getByRole('button', { name: /поменять карточку/ }));
   expect(JSON.parse(localStorage.getItem('ll.spinner.game')!).cardId).toMatch(/^b1-q/);
 });
 
