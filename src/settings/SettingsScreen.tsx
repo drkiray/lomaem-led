@@ -89,13 +89,14 @@ export function SettingsScreen() {
 
       <Modal
         open={showCredits}
+        className="modal--credits"
         title="Авторы звукового сопровождения"
         actions={<Button onClick={() => setShowCredits(false)}>Закрыть</Button>}
       >
         <p>
           Звуковые эффекты — «Interface Sounds» от Kenney (<a href="https://kenney.nl" target="_blank" rel="noreferrer">kenney.nl</a>),
           лицензия CC0 1.0 Universal (общественное достояние):{' '}
-          <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noreferrer">creativecommons.org/publicdomain/zero/1.0</a>.
+          <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noreferrer">текст лицензии</a>.
         </p>
         <p>
           Фоновая музыка — «Exotic Beauty», автор FreeGroove, с{' '}
