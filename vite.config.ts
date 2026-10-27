@@ -15,6 +15,7 @@ export default defineConfig({
         short_name: 'Ломаем Лёд',
         description: 'Патигеймы для вечеринок и дней рождения',
         lang: 'ru',
+        id: '/lomaem-led/app',
         start_url: '/lomaem-led/',
         scope: '/lomaem-led/',
         display: 'standalone',
